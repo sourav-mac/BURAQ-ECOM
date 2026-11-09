@@ -1,0 +1,52 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+Disallow: /api/
+
+# OpenAI Search & Generative Retrieval Bots
+User-agent: GPTBot
+Allow: /
+Disallow: /api/
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /api/
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /api/
+
+# Perplexity AI Answer Engine Bot
+User-agent: PerplexityBot
+Allow: /
+Disallow: /api/
+
+# Anthropic Claude Bots
+User-agent: ClaudeBot
+Allow: /
+Disallow: /api/
+
+User-agent: Claude-Web
+Allow: /
+Disallow: /api/
+
+User-agent: anthropic-ai
+Allow: /
+Disallow: /api/
+
+# Google Gemini & Extended AI Crawlers
+User-agent: Google-Extended
+Allow: /
+Disallow: /api/
+
+# Apple Intelligence Bot
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /api/
+
+# Cohere AI
+User-agent: cohere-ai
+Allow: /
+Disallow: /api/
+
+Sitemap: https://buraq.in/sitemap.xml

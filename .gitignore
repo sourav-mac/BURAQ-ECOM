@@ -1,0 +1,75 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# testing & reports
+/coverage
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# next.js & turbopack
+/.next/
+/out/
+.turbo/
+
+# production
+/build
+/dist
+
+# misc & OS
+.DS_Store
+*.pem
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+
+# debug, logs & scratch test files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+test_*.png
+test_*.html
+preview_*.png
+__pycache__/
+*.py[cod]
+
+# local env files
+.env*.local
+.env
+
+# vercel
+.vercel
+
+# IDEs
+.vscode/
+.idea/
+
+# AI agents, assistants & scratch scaffolding
+.agent/
+.agents/
+.gemini/
+.gsd/
+.kilo/
+adapters/
+scripts/
+AGENTS.md
+PROJECT_RULES.md
+GSD-STYLE.md
+model_capabilities.yaml
+VERSION
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+

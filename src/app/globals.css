@@ -1,0 +1,442 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-jakarta: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  html {
+    font-family: var(--font-jakarta);
+    background-color: #FFFDEB;
+    color: #10201F;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: #FFFDEB;
+    color: #10201F;
+    overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  ::selection {
+    background-color: #07543F;
+    color: #FFFDEB;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* 🌟 Ultra-Lightweight Hardware-Accelerated Scroll Reveal (Desktop Only ≥ 1024px) */
+  @media (min-width: 1024px) {
+    .reveal-on-scroll {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: opacity, transform;
+    }
+
+    .reveal-on-scroll.is-revealed {
+      opacity: 1;
+      transform: translateY(0);
+      will-change: auto;
+    }
+
+    .reveal-delay-1 {
+      transition-delay: 0.1s;
+    }
+    .reveal-delay-2 {
+      transition-delay: 0.2s;
+    }
+    .reveal-delay-3 {
+      transition-delay: 0.3s;
+    }
+  }
+
+  /* Disabled on Mobile & Tablet (< 1024px) */
+  @media (max-width: 1023px) {
+    .reveal-on-scroll {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal-on-scroll {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+    }
+  }
+
+  /* 🌟 Clean, Fast & Lightweight Depth Cards */
+  .depth-card {
+    background: #FFFFFF;
+    border: 1px solid rgba(226, 222, 213, 0.9);
+    box-shadow: 0 4px 16px -2px rgba(16, 32, 31, 0.06);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  }
+
+  .depth-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(7, 84, 63, 0.3);
+    box-shadow: 0 12px 28px -6px rgba(16, 32, 31, 0.1);
+  }
+
+  .depth-card-dark {
+    background: #10201F;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.35);
+  }
+
+  /* 🌟 Uiverse.io Scroll to Top by waliddu001 (BURAQ Industrial Theme) */
+  .uiverse-scroll-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #10201F;
+    border: none;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0px 0px 0px 4px rgba(8, 84, 62, 0.25);
+    cursor: pointer;
+    transition-duration: 0.3s;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .uiverse-scroll-btn .svgIcon {
+    width: 12px;
+    transition-duration: 0.3s;
+  }
+
+  .uiverse-scroll-btn .svgIcon path {
+    fill: #FFFFFF;
+  }
+
+  .uiverse-scroll-btn:hover {
+    width: 140px;
+    border-radius: 50px;
+    transition-duration: 0.3s;
+    background-color: #08543E;
+    box-shadow: 0px 0px 0px 4px rgba(8, 84, 62, 0.35);
+    align-items: center;
+  }
+
+  .uiverse-scroll-btn:hover .svgIcon {
+    transition-duration: 0.3s;
+    transform: translateY(-200%);
+  }
+
+  .uiverse-scroll-btn::before {
+    position: absolute;
+    bottom: -20px;
+    content: "Back to Top";
+    color: #FFFFFF;
+    font-size: 0px;
+  }
+
+  .uiverse-scroll-btn:hover::before {
+    font-size: 13px;
+    opacity: 1;
+    bottom: unset;
+    transition-duration: 0.3s;
+  }
+
+  /* From Uiverse.io by satyamchaudharydev */
+  .chat-generating-spinner {
+    --clr: #08543E;
+    --gap: 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--gap);
+    padding: 2px 0;
+  }
+
+  .chat-generating-spinner span {
+    width: 8px;
+    height: 8px;
+    border-radius: 100%;
+    background-color: var(--clr);
+    opacity: 0;
+  }
+
+  .chat-generating-spinner span:nth-child(1) {
+    animation: chatGeneratingFade 1s ease-in-out infinite;
+  }
+
+  .chat-generating-spinner span:nth-child(2) {
+    animation: chatGeneratingFade 1s ease-in-out 0.33s infinite;
+  }
+
+  .chat-generating-spinner span:nth-child(3) {
+    animation: chatGeneratingFade 1s ease-in-out 0.66s infinite;
+  }
+
+  @keyframes chatGeneratingFade {
+    0%, 100% {
+      opacity: 1;
+    }
+
+    60% {
+      opacity: 0;
+    }
+  }
+
+  /* From Uiverse.io by Yaya12085 */
+  .uiverse-chat-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+    background-image: linear-gradient(#ffffff 1.1rem, #ccc 1.2rem);
+    background-size: 100% 1.2rem;
+    z-index: 0;
+  }
+
+  /* 🌟 BURAQ Custom Animated Mobile Nav Switch (180deg Hamburger to X) */
+  .buraq-nav-toggle {
+    position: relative;
+    width: 38px;
+    height: 38px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6.5px;
+    background: transparent;
+    border: none;
+    outline: none;
+    user-select: none;
+    padding: 0;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .buraq-nav-toggle .bars {
+    height: 3.5px;
+    background-color: #08543E;
+    border-radius: 4px;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+      width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.4s ease,
+      background-color 0.2s ease;
+    transform-origin: center;
+    will-change: transform, width, opacity;
+  }
+
+  .buraq-nav-toggle .bar1,
+  .buraq-nav-toggle .bar3 {
+    width: 70%;
+  }
+
+  .buraq-nav-toggle .bar2 {
+    width: 100%;
+  }
+
+  .buraq-nav-toggle:hover .bars {
+    background-color: #053b2c;
+  }
+
+  .buraq-nav-toggle.is-open {
+    transform: rotate(180deg);
+  }
+
+  .buraq-nav-toggle.is-open .bar2 {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+
+  .buraq-nav-toggle.is-open .bar1 {
+    width: 100%;
+    transform: translateY(10px) rotate(45deg);
+  }
+
+  .buraq-nav-toggle.is-open .bar3 {
+    width: 100%;
+    transform: translateY(-10px) rotate(-45deg);
+  }
+
+  /* 🖥️ Responsive Fluid Ultra-Wide Screen Scaling */
+  /* Automatically expands the entire website layout on large & ultra-wide monitors (1440p, 2K, 4K) */
+  .max-w-7xl {
+    max-width: 80rem;
+    width: 100%;
+  }
+
+  @media (min-width: 1440px) {
+    .max-w-7xl {
+      max-width: 88rem; /* 1408px */
+    }
+  }
+
+  @media (min-width: 1600px) {
+    .max-w-7xl {
+      max-width: 98rem; /* 1568px */
+    }
+  }
+
+  @media (min-width: 1920px) {
+    .max-w-7xl {
+      max-width: 114rem; /* 1824px - fills Full HD 1080p smoothly */
+    }
+  }
+
+  @media (min-width: 2560px) {
+    .max-w-7xl {
+      max-width: 148rem; /* 2368px - fills 2K / 1440p / Ultrawide */
+    }
+  }
+
+  @media (min-width: 3840px) {
+    .max-w-7xl {
+      max-width: 215rem; /* 3440px - fills 4K UHD monitors */
+    }
+  }
+
+  /* 💧 Liquid Glass & Water Drop Effect (Borderless Realistic Water Droplet on Hover) */
+  .liquid-glass-btn {
+    position: relative;
+    isolation: isolate;
+    border-radius: 1.25rem;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.45) 0%,
+      rgba(255, 255, 255, 0.18) 50%,
+      rgba(255, 255, 255, 0.32) 100%
+    );
+    backdrop-filter: blur(12px) saturate(160%);
+    -webkit-backdrop-filter: blur(12px) saturate(160%);
+    border: none;
+    box-shadow: 
+      0 6px 18px -4px rgba(16, 32, 31, 0.05),
+      inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.85),
+      inset 0 -1.5px 2px 0 rgba(0, 0, 0, 0.03);
+    transition: all 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  /* Specular Highlight Spot (Sunlight reflecting off curved droplet) */
+  .liquid-glass-btn::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 12px;
+    width: 32px;
+    height: 12px;
+    border-radius: 50%;
+    background: radial-gradient(
+      ellipse at center,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(255, 255, 255, 0.5) 40%,
+      transparent 80%
+    );
+    filter: blur(0.5px);
+    pointer-events: none;
+    opacity: 0;
+    transform: rotate(-12deg) scale(0.7);
+    transition: all 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  /* 🌊 REALISTIC BORDERLESS WATER DROP ON HOVER */
+  .liquid-glass-btn:hover {
+    border-radius: 1.75rem 1.35rem 1.65rem 1.45rem;
+    background: radial-gradient(
+      120% 90% at 30% 20%,
+      rgba(255, 255, 255, 0.6) 0%,
+      rgba(255, 255, 255, 0.18) 45%,
+      rgba(255, 255, 255, 0.05) 75%,
+      rgba(255, 255, 255, 0.32) 100%
+    );
+    border: none;
+    backdrop-filter: blur(14px) saturate(190%) contrast(105%);
+    -webkit-backdrop-filter: blur(14px) saturate(190%) contrast(105%);
+    transform: translateY(-2.5px) scale(1.02);
+    box-shadow: 
+      0 16px 26px -8px rgba(16, 32, 31, 0.13),
+      0 4px 10px -2px rgba(0, 0, 0, 0.04),
+      inset 3px 4px 6px -1px rgba(255, 255, 255, 0.95),
+      inset -4px -5px 8px -1px rgba(0, 0, 0, 0.08);
+  }
+
+  /* Reveal glossy sunlight glare spot at the top-left of the droplet */
+  .liquid-glass-btn:hover::after {
+    opacity: 1;
+    transform: rotate(-10deg) scale(1);
+    top: 5px;
+    left: 14px;
+    width: 44px;
+    height: 14px;
+  }
+}
+
+/* 🔄 Ultra-Smooth Continuous Infinite Moving Brand Logos Marquee (Never Pauses) */
+@keyframes buraq-marquee-left {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes buraq-marquee-right {
+  0% {
+    transform: translate3d(-50%, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-marquee-left {
+  display: flex;
+  width: max-content;
+  animation: buraq-marquee-left 45s linear infinite;
+  animation-play-state: running !important;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  contain: layout paint;
+}
+
+.animate-marquee-right {
+  display: flex;
+  width: max-content;
+  animation: buraq-marquee-right 50s linear infinite;
+  animation-play-state: running !important;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  contain: layout paint;
+}
+
+.buraq-marquee-card {
+  contain: content;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee-left,
+  .animate-marquee-right {
+    animation: none;
+    overflow-x: auto;
+  }
+}
