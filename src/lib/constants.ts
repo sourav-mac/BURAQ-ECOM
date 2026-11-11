@@ -11,27 +11,7 @@ export interface NavItem {
 export const NAV_LINKS: NavItem[] = [
   { label: "Home", href: "/" },
   { label: "About Us", href: "/about" },
-  {
-    label: "Products",
-    href: "/products",
-    children: [
-      {
-        label: "Lighting Products",
-        href: "/products/lighting",
-        description: "LED bulbs, panels, downlights, high bays & outdoor floodlights.",
-      },
-      {
-        label: "Solar Components",
-        href: "/products/solar",
-        description: "Solar PV modules, inverters, 1.5kV DC cables, MC4 & mounting structures.",
-      },
-      {
-        label: "Electrical Products",
-        href: "/products/electrical",
-        description: "Heavy power cables, switchgear, MCBs, MCCBs & distribution accessories.",
-      },
-    ],
-  },
+  { label: "Products", href: "/products" },
   { label: "Manpower Supply", href: "/services/manpower-supply" },
   { label: "Why BURAQ", href: "/why-buraq" },
 ];

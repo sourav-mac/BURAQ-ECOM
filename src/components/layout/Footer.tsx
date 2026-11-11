@@ -3,9 +3,16 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { COMPANY_INFO } from "@/lib/constants";
 
 export const Footer: React.FC = () => {
+  const pathname = usePathname();
+
+  // Hide footer on authentication pages so auth box fills single screen
+  if (pathname === "/login" || pathname === "/auth") {
+    return null;
+  }
   return (
     <footer className="bg-buraq-dark text-white pt-16 pb-8 border-t border-buraq-dark-soft">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -33,17 +40,23 @@ export const Footer: React.FC = () => {
             </h4>
             <ul className="space-y-2.5 text-sm">
               <li>
-                <Link href="/products/lighting" className="text-gray-300 hover:text-white transition-colors">
+                <Link href="/products" className="text-white font-bold hover:text-buraq-sage transition-colors flex items-center gap-1.5">
+                  <span>All Products</span>
+                  <span className="text-[10px] px-1.5 py-0.2 bg-buraq-primary/40 rounded-full text-buraq-sage">Store</span>
+                </Link>
+              </li>
+              <li>
+                <Link href="/products?sector=lighting" className="text-gray-300 hover:text-white transition-colors">
                   Lighting Products
                 </Link>
               </li>
               <li>
-                <Link href="/products/solar" className="text-gray-300 hover:text-white transition-colors">
+                <Link href="/products?sector=solar" className="text-gray-300 hover:text-white transition-colors">
                   Solar Components
                 </Link>
               </li>
               <li>
-                <Link href="/products/electrical" className="text-gray-300 hover:text-white transition-colors">
+                <Link href="/products?sector=electrical" className="text-gray-300 hover:text-white transition-colors">
                   Electrical Products
                 </Link>
               </li>

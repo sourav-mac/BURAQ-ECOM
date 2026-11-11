@@ -67,7 +67,7 @@ const KNOWLEDGE_BASE: KnowledgeEntry[] = [
     patterns: [/who (made|created|built|developed|programmed|designed) (you|u)/i, /who is your (creator|developer|maker|author)/i, /kisne (banaya|design kiya|develop kiya)/i],
     response: `I was created by **BURAQ Enterprise** to assist you with our lighting solutions, solar components, electrical products, and technical manpower support. How can I help you today?`,
     actionButtons: [
-      { label: "Explore Lighting", action: "link", href: "/products/lighting" },
+      { label: "Explore Products", action: "link", href: "/products" },
       { label: "About BURAQ", action: "link", href: "/about" },
     ],
   },
@@ -86,7 +86,7 @@ We supply premium decorative luminaires and statement fixtures on an offline enq
 • **Festive Decorative Lanterns**: Vibrant celebration lights and traditional/modern akash kandil arrays.
 • **Architectural Spotlights & Downlights**: Anti-glare recessed downlights for showcases, corridors, and luxury interior accents.`,
     actionButtons: [
-      { label: "View Lighting Products", action: "link", href: "/products/lighting" },
+      { label: "View Lighting Products", action: "link", href: "/products?sector=lighting" },
       { label: "Enquire for Lighting", action: "link", href: "/contact" },
     ],
   },
@@ -104,7 +104,7 @@ We supply solar hardware directly to solar EPCs, electrical contractors, and com
 • **1.5kV DC Solar Cables**: Tinned copper flexible cables (4, 6, 10 sq mm) with UV and weather-resistant cross-linked insulation.
 • **Array Protection & Hardware**: IP68 MC4 connectors, custom DCDB/ACDB protection enclosures with Class II SPDs, and aluminum/HDG mounting rails.`,
     actionButtons: [
-      { label: "View Solar Components", action: "link", href: "/products/solar" },
+      { label: "View Solar Components", action: "link", href: "/products?sector=solar" },
       { label: "Enquire for Solar", action: "link", href: "/contact" },
     ],
   },
@@ -123,7 +123,7 @@ Essential electrical infrastructure materials supplied for commercial facilities
 • **Modular Wiring Devices**: Commercial modular switches, industrial sockets, and plugs.
 • **Distribution Boards & Containment**: Modular sheet metal DBs, perforated cable trays, and conduit accessories.`,
     actionButtons: [
-      { label: "View Electrical Products", action: "link", href: "/products/electrical" },
+      { label: "View Electrical Products", action: "link", href: "/products?sector=electrical" },
       { label: "Enquire for Electrical", action: "link", href: "/contact" },
     ],
   },
@@ -179,7 +179,7 @@ To receive an official quotation:
 • **Commercial Invoicing**: Official proforma invoices and bank wire/cheque arrangements are handled through our accounts desk (**account@buraq.in**).
 • **Site Delivery**: Coordinated material dispatch directly to your project site across West Bengal and neighboring regions.`,
     actionButtons: [
-      { label: "View Lighting Products", action: "link", href: "/products/lighting" },
+      { label: "View All Products", action: "link", href: "/products" },
       { label: "Contact Sales Desk", action: "link", href: "/contact" },
     ],
   },
@@ -246,7 +246,7 @@ Please share your specific product model, estimated quantity, or bill of quantit
 • Email: **buraq.ep@gmail.com**
 • Phone & WhatsApp: Direct enquiry desks launching soon`,
     actionButtons: [
-      { label: "Explore Products", action: "link", href: "/products/lighting" },
+      { label: "Explore Products", action: "link", href: "/products" },
       { label: "Send an Enquiry", action: "link", href: "/contact" },
     ],
   };

@@ -36,7 +36,7 @@ export default function NotFound() {
         {/* Quick Links to Core Product Verticals */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-left">
           <Link
-            href="/products/lighting"
+            href="/products?sector=lighting"
             className="p-3.5 rounded-2xl bg-buraq-bg/60 border border-buraq-border/60 hover:border-buraq-primary hover:bg-white transition-all group flex flex-col justify-between"
           >
             <Lightbulb className="w-5 h-5 text-amber-600 mb-2 group-hover:scale-110 transition-transform" />
@@ -49,7 +49,7 @@ export default function NotFound() {
           </Link>
 
           <Link
-            href="/products/solar"
+            href="/products?sector=solar"
             className="p-3.5 rounded-2xl bg-buraq-bg/60 border border-buraq-border/60 hover:border-buraq-primary hover:bg-white transition-all group flex flex-col justify-between"
           >
             <Sun className="w-5 h-5 text-emerald-600 mb-2 group-hover:scale-110 transition-transform" />
@@ -62,7 +62,7 @@ export default function NotFound() {
           </Link>
 
           <Link
-            href="/products/electrical"
+            href="/products?sector=electrical"
             className="p-3.5 rounded-2xl bg-buraq-bg/60 border border-buraq-border/60 hover:border-buraq-primary hover:bg-white transition-all group flex flex-col justify-between"
           >
             <Zap className="w-5 h-5 text-blue-600 mb-2 group-hover:scale-110 transition-transform" />

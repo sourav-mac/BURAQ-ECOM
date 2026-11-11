@@ -25,8 +25,14 @@ export const SmoothScroll: React.FC<{ children: React.ReactNode }> = ({
     };
   }, []);
 
-  // Reset scroll on route change
+  // Reset scroll on route change (unless restoring saved product scroll position)
   useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      sessionStorage.getItem("buraq_product_scroll_y")
+    ) {
+      return;
+    }
     window.scrollTo({ top: 0, behavior: "instant" });
   }, [pathname]);
 

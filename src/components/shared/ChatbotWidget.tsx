@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import {
   X,
   Send,
@@ -111,6 +112,7 @@ function getFormattedTime(): string {
 }
 
 export function ChatbotWidget() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [inputText, setInputText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -353,7 +355,8 @@ export function ChatbotWidget() {
     });
   };
 
-  if (!isOpen) return null;
+  // Hide on auth pages or when closed (after all hooks have safely executed)
+  if (pathname === "/login" || pathname === "/auth" || !isOpen) return null;
 
   return (
     <div className="fixed bottom-3 sm:bottom-5 inset-x-0 sm:inset-x-auto sm:right-6 z-50 flex justify-center sm:justify-end px-3.5 sm:px-0 pointer-events-none transition-all">

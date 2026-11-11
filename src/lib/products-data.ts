@@ -9,6 +9,15 @@ export interface ProductItem {
   specifications?: string[];
   applications?: string[];
   featured?: boolean;
+  price: number;
+  mrp: number;
+  discountPercent: number;
+  rating: number;
+  reviewsCount: number;
+  badge?: "Best Seller" | "Buraq Assured" | "Trending" | "Top Rated";
+  inStock: boolean;
+  brand?: string;
+  unit?: string;
 }
 
 export interface ProductCategory {
@@ -102,6 +111,15 @@ export const PRODUCTS_CATALOGUE: ProductItem[] = [
       "Modern dining spaces, cafes, and architectural interiors",
     ],
     featured: true,
+    price: 3499,
+    mrp: 5499,
+    discountPercent: 36,
+    rating: 4.7,
+    reviewsCount: 148,
+    badge: "Best Seller",
+    inStock: true,
+    brand: "BURAQ Artisan",
+    unit: "piece",
   },
   {
     id: "crystal-art-chandeliers",
@@ -124,6 +142,15 @@ export const PRODUCTS_CATALOGUE: ProductItem[] = [
       "Grand residential drawing rooms and luxury penthouses",
     ],
     featured: true,
+    price: 14200,
+    mrp: 21999,
+    discountPercent: 35,
+    rating: 4.9,
+    reviewsCount: 92,
+    badge: "Top Rated",
+    inStock: true,
+    brand: "BURAQ Royal",
+    unit: "piece",
   },
   {
     id: "antique-brass-lanterns",
@@ -146,6 +173,15 @@ export const PRODUCTS_CATALOGUE: ProductItem[] = [
       "Festival, cultural, and ambient architectural spaces",
     ],
     featured: true,
+    price: 2199,
+    mrp: 3499,
+    discountPercent: 37,
+    rating: 4.6,
+    reviewsCount: 116,
+    badge: "Buraq Assured",
+    inStock: true,
+    brand: "BURAQ Heritage",
+    unit: "piece",
   },
   {
     id: "festive-decorative-lanterns",
@@ -168,6 +204,15 @@ export const PRODUCTS_CATALOGUE: ProductItem[] = [
       "Event staging, banquet lawns, and festive celebrations",
     ],
     featured: false,
+    price: 899,
+    mrp: 1499,
+    discountPercent: 40,
+    rating: 4.4,
+    reviewsCount: 230,
+    badge: "Trending",
+    inStock: true,
+    brand: "BURAQ Lumina",
+    unit: "set",
   },
   {
     id: "commercial-downlights",
@@ -190,6 +235,15 @@ export const PRODUCTS_CATALOGUE: ProductItem[] = [
       "Hotel corridors, executive reception foyers, and modern commercial ceilings",
     ],
     featured: false,
+    price: 650,
+    mrp: 1100,
+    discountPercent: 41,
+    rating: 4.5,
+    reviewsCount: 175,
+    badge: "Buraq Assured",
+    inStock: true,
+    brand: "BURAQ Pro",
+    unit: "piece",
   },
   {
     id: "ceremonial-diya-chandeliers",
@@ -212,6 +266,15 @@ export const PRODUCTS_CATALOGUE: ProductItem[] = [
       "Hotel atriums, heritage venues, and celebration pavilions",
     ],
     featured: false,
+    price: 5850,
+    mrp: 8999,
+    discountPercent: 35,
+    rating: 4.8,
+    reviewsCount: 84,
+    badge: "Best Seller",
+    inStock: true,
+    brand: "BURAQ Ezra Heritage",
+    unit: "piece",
   },
 
   // --- SOLAR COMPONENTS ---
@@ -236,6 +299,15 @@ export const PRODUCTS_CATALOGUE: ProductItem[] = [
       "Captive solar installations for manufacturing units",
     ],
     featured: true,
+    price: 16500,
+    mrp: 22000,
+    discountPercent: 25,
+    rating: 4.8,
+    reviewsCount: 312,
+    badge: "Best Seller",
+    inStock: true,
+    brand: "Tier-1 Mono PERC",
+    unit: "panel (540W)",
   },
   {
     id: "solar-inverters",
@@ -258,6 +330,15 @@ export const PRODUCTS_CATALOGUE: ProductItem[] = [
       "EPC contractor bulk supply requirements",
     ],
     featured: true,
+    price: 42000,
+    mrp: 56000,
+    discountPercent: 25,
+    rating: 4.7,
+    reviewsCount: 145,
+    badge: "Buraq Assured",
+    inStock: true,
+    brand: "BURAQ SolarTech",
+    unit: "unit (5kW/10kW)",
   },
   {
     id: "solar-dc-cables",
@@ -280,6 +361,15 @@ export const PRODUCTS_CATALOGUE: ProductItem[] = [
       "Solar EPC project balance-of-system wiring",
     ],
     featured: false,
+    price: 3850,
+    mrp: 5200,
+    discountPercent: 26,
+    rating: 4.6,
+    reviewsCount: 198,
+    badge: "Trending",
+    inStock: true,
+    brand: "BURAQ FlexiSolar",
+    unit: "100m roll (4 sq mm)",
   },
   {
     id: "solar-mc4-connectors",
@@ -302,6 +392,15 @@ export const PRODUCTS_CATALOGUE: ProductItem[] = [
       "Field repairs and contractor installations",
     ],
     featured: false,
+    price: 480,
+    mrp: 750,
+    discountPercent: 36,
+    rating: 4.5,
+    reviewsCount: 260,
+    badge: "Buraq Assured",
+    inStock: true,
+    brand: "BURAQ Connect",
+    unit: "pack of 10 pairs",
   },
   {
     id: "solar-mounting-structures",
@@ -324,6 +423,15 @@ export const PRODUCTS_CATALOGUE: ProductItem[] = [
       "Solar carports and ground-mount structures",
     ],
     featured: true,
+    price: 8200,
+    mrp: 11500,
+    discountPercent: 29,
+    rating: 4.8,
+    reviewsCount: 112,
+    badge: "Best Seller",
+    inStock: true,
+    brand: "BURAQ HDG Alu",
+    unit: "1kW set",
   },
   {
     id: "solar-dcdb-acdb",
@@ -346,6 +454,15 @@ export const PRODUCTS_CATALOGUE: ProductItem[] = [
       "Contractor and EPC project installations",
     ],
     featured: false,
+    price: 5400,
+    mrp: 7800,
+    discountPercent: 31,
+    rating: 4.6,
+    reviewsCount: 89,
+    badge: "Buraq Assured",
+    inStock: true,
+    brand: "BURAQ ArraySafe",
+    unit: "enclosure unit",
   },
 
   // --- ELECTRICAL PRODUCTS ---
@@ -370,6 +487,15 @@ export const PRODUCTS_CATALOGUE: ProductItem[] = [
       "Commercial building main riser shafts and distribution panels",
     ],
     featured: true,
+    price: 12400,
+    mrp: 16800,
+    discountPercent: 26,
+    rating: 4.8,
+    reviewsCount: 278,
+    badge: "Best Seller",
+    inStock: true,
+    brand: "BURAQ PowerCore",
+    unit: "100m coil",
   },
   {
     id: "industrial-switchgear",
@@ -392,6 +518,15 @@ export const PRODUCTS_CATALOGUE: ProductItem[] = [
       "Commercial building tenant meter panels",
     ],
     featured: true,
+    price: 1450,
+    mrp: 2200,
+    discountPercent: 34,
+    rating: 4.7,
+    reviewsCount: 320,
+    badge: "Buraq Assured",
+    inStock: true,
+    brand: "BURAQ VoltGuard",
+    unit: "piece (3-Pole/4-Pole)",
   },
   {
     id: "contactors-isolators",
@@ -414,6 +549,15 @@ export const PRODUCTS_CATALOGUE: ProductItem[] = [
       "Outdoor equipment safety disconnect stations",
     ],
     featured: false,
+    price: 1850,
+    mrp: 2750,
+    discountPercent: 33,
+    rating: 4.6,
+    reviewsCount: 164,
+    badge: "Trending",
+    inStock: true,
+    brand: "BURAQ RelayPro",
+    unit: "piece",
   },
   {
     id: "commercial-switches",
@@ -436,6 +580,15 @@ export const PRODUCTS_CATALOGUE: ProductItem[] = [
       "Commercial facility maintenance plug points",
     ],
     featured: false,
+    price: 920,
+    mrp: 1450,
+    discountPercent: 37,
+    rating: 4.5,
+    reviewsCount: 210,
+    badge: "Buraq Assured",
+    inStock: true,
+    brand: "BURAQ Modular",
+    unit: "box (10 pcs)",
   },
   {
     id: "distribution-boards",
@@ -458,6 +611,15 @@ export const PRODUCTS_CATALOGUE: ProductItem[] = [
       "Contractor infrastructure electrification projects",
     ],
     featured: true,
+    price: 2950,
+    mrp: 4500,
+    discountPercent: 34,
+    rating: 4.7,
+    reviewsCount: 182,
+    badge: "Best Seller",
+    inStock: true,
+    brand: "BURAQ Distribution",
+    unit: "enclosure (8-way/12-way)",
   },
   {
     id: "wiring-accessories",
@@ -480,5 +642,34 @@ export const PRODUCTS_CATALOGUE: ProductItem[] = [
       "Electrical contractor BOQ bulk material supply",
     ],
     featured: false,
+    price: 780,
+    mrp: 1200,
+    discountPercent: 35,
+    rating: 4.4,
+    reviewsCount: 195,
+    badge: "Trending",
+    inStock: true,
+    brand: "BURAQ CableSafe",
+    unit: "set / bundle",
   },
 ];
+
+export function getProductById(id: string): ProductItem | undefined {
+  if (!id) return undefined;
+  return PRODUCTS_CATALOGUE.find(
+    (p) => p.id.toLowerCase() === id.toLowerCase()
+  );
+}
+
+export function getRelatedProducts(
+  currentId: string,
+  category?: string,
+  limit = 4
+): ProductItem[] {
+  return PRODUCTS_CATALOGUE.filter(
+    (p) =>
+      p.id !== currentId &&
+      (!category || p.category.toLowerCase() === category.toLowerCase())
+  ).slice(0, limit);
+}
+

@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, CheckCircle2, AlertCircle, Send } from "lucide-react";
+import { createPortal } from "react-dom";
+import Image from "next/image";
+import { X, CheckCircle2, Send, Star } from "lucide-react";
 import { ProductItem } from "@/lib/products-data";
-import { COMPANY_INFO } from "@/lib/constants";
+import { useAuth } from "@/lib/auth-context";
 
 interface ProductEnquiryModalProps {
   product: ProductItem | null;
@@ -26,6 +28,22 @@ export const ProductEnquiryModal: React.FC<ProductEnquiryModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Autofill user details if authenticated
+  useEffect(() => {
+    if (user && isOpen) {
+      if (user.name) setFullName((prev) => prev || user.name);
+      if (user.email) setEmail((prev) => prev || user.email);
+      if (user.phone) setPhone((prev) => prev || user.phone || "");
+      if (user.company) setCompanyName((prev) => prev || user.company || "");
+    }
+  }, [user, isOpen]);
 
   // Close on Escape key
   useEffect(() => {
@@ -49,7 +67,7 @@ export const ProductEnquiryModal: React.FC<ProductEnquiryModalProps> = ({
     };
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -110,22 +128,22 @@ export const ProductEnquiryModal: React.FC<ProductEnquiryModalProps> = ({
     }
   };
 
-  return (
+  return createPortal(
     <div
       onClick={onClose}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200 cursor-pointer"
+      className="fixed inset-0 z-[999999] flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md animate-in fade-in duration-200 cursor-pointer"
       role="dialog"
       aria-modal="true"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-lg bg-[#FFFDEB] text-buraq-dark rounded-[24px] sm:rounded-[28px] p-6 sm:p-8 border border-black/[0.08] shadow-[0_25px_60px_-15px_rgba(16,32,31,0.35)] flex flex-col gap-4 animate-in zoom-in-95 duration-200 cursor-default max-h-[92vh] overflow-y-auto"
+        className="relative z-10 w-full max-w-lg bg-[#FFFDEB] text-buraq-dark rounded-[24px] sm:rounded-[28px] p-6 sm:p-8 border border-black/[0.08] shadow-[0_25px_60px_-15px_rgba(16,32,31,0.4)] flex flex-col gap-4 animate-in zoom-in-95 duration-200 cursor-default max-h-[90vh] overflow-y-auto"
       >
         {/* Close Button */}
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-full text-buraq-dark/60 hover:text-buraq-dark hover:bg-black/5 transition-colors"
+          className="absolute top-5 right-5 p-2 rounded-full text-buraq-dark/60 hover:text-buraq-dark hover:bg-black/5 transition-colors cursor-pointer"
           aria-label="Close modal"
         >
           <X className="w-5 h-5" />
@@ -150,7 +168,7 @@ export const ProductEnquiryModal: React.FC<ProductEnquiryModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-6 py-2.5 rounded-full bg-buraq-primary text-white text-sm font-bold hover:bg-buraq-dark transition-colors"
+                className="px-6 py-2.5 rounded-full bg-buraq-primary text-white text-sm font-bold hover:bg-buraq-dark transition-colors cursor-pointer"
               >
                 Done
               </button>
@@ -158,19 +176,48 @@ export const ProductEnquiryModal: React.FC<ProductEnquiryModalProps> = ({
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <span className="inline-block text-[10px] font-bold uppercase tracking-wider text-buraq-primary bg-buraq-primary/10 px-2.5 py-1 rounded-full mb-2">
-                Product Supply Enquiry
-              </span>
+            <div className="pr-8">
               <h3 className="text-xl sm:text-2xl font-black text-buraq-dark tracking-tight leading-snug">
                 {product ? product.name : "Product Availability Enquiry"}
               </h3>
-              {product && (
-                <p className="text-xs text-buraq-muted mt-1 font-medium">
-                  Category: <span className="text-buraq-dark font-bold">{product.categoryName}</span>
-                </p>
-              )}
             </div>
+
+            {/* Product Summary Preview Card */}
+            {product && (
+              <div className="flex items-center gap-3.5 p-3 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs">
+                <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-neutral-100 flex-shrink-0">
+                  <Image
+                    src={product.image}
+                    alt={product.name}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-[10px] font-bold uppercase text-buraq-accent tracking-wider">
+                    {product.categoryName} &bull; {product.brand || "BURAQ"}
+                  </div>
+                  <div className="text-xs sm:text-[13px] font-bold text-buraq-dark truncate mt-0.5">
+                    {product.name}
+                  </div>
+                  <div className="flex items-center gap-2 mt-1 flex-wrap">
+                    <span className="text-sm font-extrabold text-buraq-dark">
+                      ₹{product.price.toLocaleString("en-IN")}
+                    </span>
+                    <span className="text-[11px] text-neutral-400 line-through font-medium">
+                      ₹{product.mrp.toLocaleString("en-IN")}
+                    </span>
+                    <span className="text-[10px] font-bold text-emerald-600">
+                      {product.discountPercent}% off
+                    </span>
+                    <div className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded bg-emerald-600 text-white text-[10px] font-bold">
+                      <span>{product.rating.toFixed(1)}</span>
+                      <Star className="w-2.5 h-2.5 fill-white" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {errorMsg && (
               <p className="text-xs font-semibold text-rose-600">
@@ -280,6 +327,7 @@ export const ProductEnquiryModal: React.FC<ProductEnquiryModalProps> = ({
           </form>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

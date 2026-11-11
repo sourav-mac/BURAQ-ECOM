@@ -20,7 +20,7 @@ export const HOME_FAQS: FaqItem[] = [
       "Our core portfolio spans commercial LED panels (2x2) and industrial high bay lights, Mono PERC and bifacial solar PV modules, on-grid string inverters, 1.5kV solar DC cables, heavy armoured LT/HT cables (XLPE/PVC), circuit breakers (MCB/MCCB), and power distribution boards for plants and contractors.",
     badge: "Product Range",
     linkText: "View Products",
-    linkHref: "/products/lighting",
+    linkHref: "/products",
   },
   {
     q: "Where is BURAQ Enterprise located in Kolkata and West Bengal?",

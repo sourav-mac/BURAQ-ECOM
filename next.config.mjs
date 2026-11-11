@@ -47,13 +47,8 @@ const nextConfig = {
   async redirects() {
     return [
       {
-        source: "/products",
-        destination: "/products/lighting",
-        permanent: true,
-      },
-      {
         source: "/services/electrical-trading",
-        destination: "/products/electrical",
+        destination: "/products?sector=electrical",
         permanent: true,
       },
     ];

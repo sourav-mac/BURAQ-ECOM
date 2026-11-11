@@ -3,15 +3,8 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { Lightbulb, Sun, Zap, Users, ArrowRight, Layers } from "lucide-react";
 import { SmoothLoopVideo } from "./SmoothLoopVideo";
-
-const PRODUCT_ROUTES = [
-  "/products/lighting",
-  "/products/solar",
-  "/products/electrical",
-];
 
 const HERO_HEADLINES = [
   {
@@ -106,14 +99,6 @@ const RotatingHeroHeadline: React.FC = () => {
 };
 
 export const HeroSection: React.FC = () => {
-  const router = useRouter();
-
-  const handleRandomProductClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    const randomIndex = Math.floor(Math.random() * PRODUCT_ROUTES.length);
-    router.push(PRODUCT_ROUTES[randomIndex]);
-  };
-
   return (
     <section className="relative overflow-hidden pt-10 sm:pt-14 lg:pt-16 pb-8 sm:pb-12 lg:pb-14 bg-gradient-to-b from-[#FFFDEB] via-[#FCFCEF] to-[#F2F7F4]">
       {/* Background Layer: Full-Width Zero-Seam Cross-fading Video Loop */}
@@ -152,8 +137,7 @@ export const HeroSection: React.FC = () => {
             {/* Action Buttons: Explore Products */}
             <div className="pt-2 flex flex-wrap items-center gap-3 sm:gap-4">
               <Link
-                href="/products/lighting"
-                onClick={handleRandomProductClick}
+                href="/products"
                 className="inline-flex items-center justify-center gap-2.5 px-7 sm:px-8 py-3.5 rounded-full bg-buraq-primary text-white font-bold text-sm sm:text-base shadow-[0_10px_25px_-5px_rgba(8,84,62,0.4)] hover:bg-buraq-dark hover:shadow-[0_15px_30px_-5px_rgba(16,32,31,0.5)] transition-all duration-300 transform hover:-translate-y-0.5 cursor-pointer"
               >
                 <Layers className="w-4 h-4 text-buraq-sage" />
@@ -165,7 +149,7 @@ export const HeroSection: React.FC = () => {
             <div className="hidden lg:grid pt-6 grid-cols-3 gap-3.5 items-stretch max-w-2xl">
               {/* Pillar 1: Lighting Products */}
               <Link
-                href="/products/lighting"
+                href="/products?sector=lighting"
                 className="liquid-glass-btn flex items-center gap-3 p-3.5 group"
               >
                 <Lightbulb className="w-6 h-6 text-amber-600 flex-shrink-0 group-hover:scale-110 transition-transform" />
@@ -177,7 +161,7 @@ export const HeroSection: React.FC = () => {
 
               {/* Pillar 2: Solar Components */}
               <Link
-                href="/products/solar"
+                href="/products?sector=solar"
                 className="liquid-glass-btn flex items-center gap-3 p-3.5 group"
               >
                 <Sun className="w-6 h-6 text-emerald-600 flex-shrink-0 group-hover:scale-110 transition-transform" />
@@ -189,7 +173,7 @@ export const HeroSection: React.FC = () => {
 
               {/* Pillar 3: Electrical Products */}
               <Link
-                href="/products/electrical"
+                href="/products?sector=electrical"
                 className="liquid-glass-btn flex items-center gap-3 p-3.5 group"
               >
                 <Zap className="w-6 h-6 text-blue-600 flex-shrink-0 group-hover:scale-110 transition-transform" />
@@ -223,7 +207,7 @@ export const HeroSection: React.FC = () => {
         {/* Mobile & Tablet 3 Product Pillars Triad */}
         <div className="lg:hidden mt-6 pt-4 border-t border-buraq-border/60 grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
           <Link
-            href="/products/lighting"
+            href="/products?sector=lighting"
             className="liquid-glass-btn flex items-center justify-between p-3.5 group"
           >
             <div className="flex items-center gap-3">
@@ -236,7 +220,7 @@ export const HeroSection: React.FC = () => {
           </Link>
 
           <Link
-            href="/products/solar"
+            href="/products?sector=solar"
             className="liquid-glass-btn flex items-center justify-between p-3.5 group"
           >
             <div className="flex items-center gap-3">
@@ -249,7 +233,7 @@ export const HeroSection: React.FC = () => {
           </Link>
 
           <Link
-            href="/products/electrical"
+            href="/products?sector=electrical"
             className="liquid-glass-btn flex items-center justify-between p-3.5 group"
           >
             <div className="flex items-center gap-3">

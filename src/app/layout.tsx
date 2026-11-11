@@ -6,6 +6,8 @@ import { Footer } from "@/components/layout/Footer";
 import { SmoothScroll } from "@/components/providers/SmoothScroll";
 import { ChatbotWidget } from "@/components/shared/ChatbotWidget";
 import { AgentationWrapper } from "@/components/shared/AgentationWrapper";
+import { AuthProvider } from "@/lib/auth-context";
+import { AuthModal } from "@/components/auth/AuthModal";
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -301,15 +303,18 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans antialiased min-h-screen flex flex-col bg-[#FFFDEB] text-buraq-dark relative selection:bg-buraq-primary selection:text-white">
-        <SmoothScroll>
-          <div className="relative z-10 flex-1 flex flex-col min-h-screen">
-            <Navbar />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </div>
-          <ChatbotWidget />
-          <AgentationWrapper />
-        </SmoothScroll>
+        <AuthProvider>
+          <SmoothScroll>
+            <div className="relative z-10 flex-1 flex flex-col min-h-screen">
+              <Navbar />
+              <main className="flex-1">{children}</main>
+              <Footer />
+            </div>
+            <ChatbotWidget />
+            <AgentationWrapper />
+          </SmoothScroll>
+          <AuthModal />
+        </AuthProvider>
       </body>
     </html>
   );

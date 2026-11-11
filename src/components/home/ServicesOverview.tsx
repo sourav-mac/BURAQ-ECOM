@@ -42,7 +42,7 @@ export const ServicesOverview: React.FC = () => {
               >
                 {/* Image Cover */}
                 <Link
-                  href={`/products/${cat.slug}`}
+                  href={`/products?sector=${cat.slug}`}
                   className="relative h-48 sm:h-52 2xl:h-64 w-full overflow-hidden rounded-2xl bg-buraq-dark shadow-sm group block"
                 >
                   <Image
@@ -60,7 +60,7 @@ export const ServicesOverview: React.FC = () => {
                 <div className="pt-6 flex-1 flex flex-col justify-between space-y-6">
                   <div className="space-y-4">
                     <div>
-                      <Link href={`/products/${cat.slug}`} className="hover:text-buraq-primary transition-colors">
+                      <Link href={`/products?sector=${cat.slug}`} className="hover:text-buraq-primary transition-colors">
                         <h3 className="text-xl font-bold text-buraq-dark hover:text-buraq-primary transition-colors">
                           {cat.name}
                         </h3>
@@ -88,7 +88,7 @@ export const ServicesOverview: React.FC = () => {
                   {/* Descriptive Link */}
                   <div className="pt-2">
                     <Link
-                      href={`/products/${cat.slug}`}
+                      href={`/products?sector=${cat.slug}`}
                       className="inline-flex items-center gap-2 text-sm font-bold text-buraq-primary hover:text-buraq-dark transition-all group/btn"
                     >
                       <span>Explore {cat.name}</span>
