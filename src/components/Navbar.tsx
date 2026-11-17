@@ -13,12 +13,27 @@ export function Navbar() {
   const { user, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const navLinks = [
+  const mainLinks = [
     { label: "Home", href: "/" },
     { label: "Lighting", href: "/category/lighting" },
-    { label: "Electrical", href: "/category/electrical" },
-    { label: "Solar Energy", href: "/category/solar" },
+    { label: "Wire", href: "/category/wire" },
+    { label: "Fan", href: "/category/fan" },
+    { label: "MCB", href: "/category/mcb" },
+    { label: "Switch", href: "/category/switch" },
     { label: "All Products", href: "/products" },
+  ];
+
+  const allCategories = [
+    { label: "LIGHTING", href: "/category/lighting" },
+    { label: "WIRE", href: "/category/wire" },
+    { label: "FAN", href: "/category/fan" },
+    { label: "MCB", href: "/category/mcb" },
+    { label: "SWITCH", href: "/category/switch" },
+    { label: "ACCESSORIES", href: "/category/accessories" },
+    { label: "WALL LAMP", href: "/category/wall-lamp" },
+    { label: "HANGING LAMP", href: "/category/hanging-lamp" },
+    { label: "CEILING LIGHT", href: "/category/ceiling-light" },
+    { label: "OTHERS", href: "/category/others" },
   ];
 
   return (
@@ -34,20 +49,20 @@ export function Navbar() {
               BURAQ <span className="text-[#07543F] text-xs font-bold uppercase tracking-widest px-1.5 py-0.5 rounded-sm bg-[#E7F1EB] border border-[#07543F]/20">Store</span>
             </span>
             <p className="text-[10px] text-[#667085] tracking-wider font-medium uppercase">
-              Lights • Electricals • Solar
+              Lights • Electricals • Hardware
             </p>
           </div>
         </Link>
 
         {/* Center Pill Nav Menu */}
-        <nav className="hidden md:flex items-center gap-1.5 p-1.5 rounded-full bg-[#FFFFFF] border border-[#E2DED5]">
-          {navLinks.map((link) => {
+        <nav className="hidden lg:flex items-center gap-1 p-1.5 rounded-full bg-white border border-[#E2DED5]">
+          {mainLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide ${
+                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wide ${
                   isActive
                     ? "bg-[#07543F] text-[#FFFDEB] font-bold shadow-xs"
                     : "text-[#10201F]"
@@ -64,7 +79,7 @@ export function Navbar() {
           {/* Cart Icon Trigger */}
           <button
             onClick={() => setIsCartOpen(true)}
-            className="relative p-2.5 rounded-xl bg-[#FFFFFF] border border-[#E2DED5] text-[#10201F] cursor-pointer"
+            className="relative p-2.5 rounded-xl bg-white border border-[#E2DED5] text-[#10201F] cursor-pointer"
             aria-label="Shopping Cart"
           >
             <ShoppingBag className="w-4 h-4" />
@@ -79,7 +94,7 @@ export function Navbar() {
           {user ? (
             <Link
               href="/account"
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#FFFFFF] border border-[#E2DED5] text-[#10201F] text-xs font-bold"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-[#E2DED5] text-[#10201F] text-xs font-bold"
             >
               <div className="w-5 h-5 rounded-full bg-[#07543F] text-[#FFFDEB] flex items-center justify-center text-[10px] font-bold">
                 {user.name.slice(0, 1).toUpperCase()}
@@ -89,7 +104,7 @@ export function Navbar() {
           ) : (
             <Link
               href="/signin"
-              className="hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#FFFFFF] border border-[#E2DED5] text-[#10201F] text-xs font-bold cursor-pointer"
+              className="hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-[#E2DED5] text-[#10201F] text-xs font-bold cursor-pointer"
             >
               <User className="w-3.5 h-3.5" />
               <span>Sign In</span>
@@ -107,7 +122,7 @@ export function Navbar() {
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-xl bg-[#FFFFFF] border border-[#E2DED5] text-[#10201F] cursor-pointer"
+            className="lg:hidden p-2 rounded-xl bg-white border border-[#E2DED5] text-[#10201F] cursor-pointer"
             aria-label="Toggle Navigation"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -117,17 +132,23 @@ export function Navbar() {
 
       {/* Mobile Nav Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#FFFFFF] border-b border-[#E2DED5] px-4 py-4 space-y-2">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={() => setMobileMenuOpen(false)}
-              className="block px-3 py-2 rounded-lg text-sm font-semibold text-[#10201F]"
-            >
-              {link.label}
-            </Link>
-          ))}
+        <div className="lg:hidden bg-white border-b border-[#E2DED5] px-4 py-4 space-y-3">
+          <div className="text-[11px] font-black uppercase text-[#07543F] tracking-wider">
+            All Categories
+          </div>
+          <div className="grid grid-cols-2 gap-1.5">
+            {allCategories.map((cat) => (
+              <Link
+                key={cat.href}
+                href={cat.href}
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-2.5 py-2 rounded-lg text-xs font-bold text-[#10201F] bg-[#FAF8E4] border border-[#E2DED5]"
+              >
+                {cat.label}
+              </Link>
+            ))}
+          </div>
+
           <div className="pt-3 border-t border-[#E2DED5] flex items-center justify-between gap-3">
             {user ? (
               <button
@@ -153,7 +174,7 @@ export function Navbar() {
               onClick={() => setMobileMenuOpen(false)}
               className="px-3 py-1.5 rounded-lg bg-[#07543F] text-[#FFFDEB] text-xs font-bold"
             >
-              Catalog
+              Full Catalog
             </Link>
           </div>
         </div>

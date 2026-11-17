@@ -71,10 +71,12 @@ export function Footer() {
           <div>
             <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-3">Shop Categories</h4>
             <ul className="space-y-2 text-xs">
-              <li><Link href="/category/lighting" className="text-white/70">Lighting Fixtures</Link></li>
-              <li><Link href="/category/electrical" className="text-white/70">Cables & Switchgear</Link></li>
-              <li><Link href="/category/solar" className="text-white/70">Solar PV & Inverters</Link></li>
-              <li><Link href="/products" className="text-white/70">Complete Catalog</Link></li>
+              <li><Link href="/category/lighting" className="text-white/70">LIGHTING</Link></li>
+              <li><Link href="/category/wire" className="text-white/70">WIRE</Link></li>
+              <li><Link href="/category/fan" className="text-white/70">FAN</Link></li>
+              <li><Link href="/category/mcb" className="text-white/70">MCB</Link></li>
+              <li><Link href="/category/switch" className="text-white/70">SWITCH</Link></li>
+              <li><Link href="/products" className="text-white/70">All 10 Categories →</Link></li>
             </ul>
           </div>
 
