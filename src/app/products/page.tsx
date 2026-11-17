@@ -98,21 +98,29 @@ export default function ProductsCatalogPage() {
         </div>
       </div>
 
-      {/* Categories Strip */}
-      <div className="flex flex-wrap items-center gap-2">
-        {CATEGORIES.map((c) => (
-          <button
-            key={c.id}
-            onClick={() => setSelectedCategory(c.id)}
-            className={`px-4 py-2 rounded-full text-xs font-bold tracking-wide whitespace-nowrap cursor-pointer transition-none ${
-              selectedCategory === c.id
-                ? "bg-[#07543F] text-white shadow-xs border border-[#07543F]"
-                : "bg-white border border-[#E2DED5] text-[#10201F] shadow-2xs"
-            }`}
-          >
-            {c.label}
-          </button>
-        ))}
+      {/* Clean Line-Divided Category Links (No Box Design) */}
+      <div className="flex flex-wrap items-center gap-y-2 text-xs">
+        {CATEGORIES.map((c, index) => {
+          const isSelected = selectedCategory === c.id;
+
+          return (
+            <React.Fragment key={c.id}>
+              {index > 0 && (
+                <span className="text-[#C5BEB3] px-2.5 select-none">|</span>
+              )}
+              <button
+                onClick={() => setSelectedCategory(c.id)}
+                className={`py-1 uppercase tracking-wider font-bold transition-none cursor-pointer ${
+                  isSelected
+                    ? "text-[#07543F] underline decoration-2 underline-offset-4 font-black"
+                    : "text-[#10201F]/80"
+                }`}
+              >
+                {c.label}
+              </button>
+            </React.Fragment>
+          );
+        })}
       </div>
 
       {/* Catalog Grid */}
