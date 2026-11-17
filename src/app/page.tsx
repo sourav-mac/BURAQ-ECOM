@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { Sparkles } from "lucide-react";
 import { PRODUCTS } from "@/data/products";
 import { ProductCard } from "@/components/ProductCard";
 
@@ -18,10 +17,6 @@ export default function HomePage() {
       {/* Product Category Filter Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E2DED5] pb-6">
         <div>
-          <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-[#07543F] mb-1">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Available In Stock</span>
-          </div>
           <h1 className="text-2xl sm:text-3xl font-black uppercase text-[#10201F] tracking-tight">
             Products Catalog
           </h1>

@@ -35,11 +35,8 @@ export default function CategoryPage() {
   return (
     <div className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full space-y-10">
       {/* Category Banner */}
-      <div className="p-8 sm:p-12 rounded-3xl bg-white border border-[#E2DED5] shadow-xs relative overflow-hidden space-y-4">
-        <span className="text-xs font-bold uppercase tracking-widest text-[#D96B1F]">
-          BURAQ CATEGORY SHOWCASE
-        </span>
-        <h1 className="text-3xl sm:text-5xl font-black uppercase text-[#10201F] tracking-tight">
+      <div className="p-8 sm:p-10 rounded-2xl bg-white border border-[#E2DED5] shadow-xs relative overflow-hidden space-y-2">
+        <h1 className="text-2xl sm:text-4xl font-black uppercase text-[#10201F] tracking-tight">
           {currentInfo.title}
         </h1>
         <p className="text-xs sm:text-sm text-[#10201F]/60 max-w-2xl leading-relaxed">
