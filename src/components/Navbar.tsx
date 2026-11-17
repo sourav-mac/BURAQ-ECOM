@@ -79,14 +79,6 @@ export function Navbar() {
             </Link>
           )}
 
-          {/* Primary Shop / Catalog Button */}
-          <Link
-            href="/products"
-            className="hidden sm:inline-flex items-center justify-center px-4 py-2 rounded-xl bg-[#07543F] text-[#FFFDEB] text-xs font-black uppercase tracking-wider shadow-xs"
-          >
-            All Products
-          </Link>
-
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
