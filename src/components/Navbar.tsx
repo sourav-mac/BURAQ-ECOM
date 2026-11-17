@@ -3,13 +3,15 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ShoppingCart, Menu, X, ChevronDown, LogOut, User } from "lucide-react";
+import { ShoppingCart, Menu, X, ChevronDown, LogOut, User, Search } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
+import { useFilter } from "@/context/FilterContext";
 
 export function Navbar() {
   const { totalItems, setIsCartOpen } = useCart();
   const { user, logout } = useAuth();
+  const { searchTerm, setSearchTerm, sortOption, setSortOption } = useFilter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
@@ -44,7 +46,7 @@ export function Navbar() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4 sm:gap-6">
         <Link href="/" className="flex items-center shrink-0">
           <Image
             src="/images/buraq-logo.png"
@@ -56,13 +58,55 @@ export function Navbar() {
           />
         </Link>
 
-        {/* Desktop nav */}
-        <nav className="hidden lg:flex items-center gap-7">
+        {/* Search & Sort in Navbar */}
+        <div className="flex-1 max-w-xl hidden md:flex items-center h-11 rounded-2xl bg-white border border-[#E2DED5] shadow-xs transition-none">
+          {/* Search Input */}
+          <div className="relative flex-1 h-full flex items-center">
+            <Search className="w-[18px] h-[18px] text-[#07543F] absolute left-4 pointer-events-none" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search lights, wires, fans..."
+              className="w-full h-full pl-11 pr-9 bg-transparent text-sm text-[#10201F] placeholder:text-[#667085] focus:outline-none"
+            />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm("")}
+                aria-label="Clear search"
+                className="absolute right-2 w-6 h-6 rounded-full text-[#667085] hover:bg-[#10201F]/5 hover:text-[#10201F] flex items-center justify-center cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          <span className="w-px h-6 bg-[#E2DED5]" />
+
+          {/* Sort Dropdown */}
+          <div className="relative shrink-0 h-full flex items-center">
+            <select
+              value={sortOption}
+              onChange={(e) => setSortOption(e.target.value as any)}
+              aria-label="Sort products"
+              className="appearance-none h-full pl-4 pr-9 bg-transparent text-sm font-medium text-[#10201F] focus:outline-none cursor-pointer rounded-r-2xl"
+            >
+              <option value="featured">Featured</option>
+              <option value="price-asc">Price: Low → High</option>
+              <option value="price-desc">Price: High → Low</option>
+              <option value="rating">Top Rated</option>
+            </select>
+            <ChevronDown className="pointer-events-none absolute right-3 w-4 h-4 text-[#667085]" />
+          </div>
+        </div>
+
+        {/* Desktop nav links */}
+        <nav className="hidden xl:flex items-center gap-5">
           {navLinks.map((l) => (
             <Link
               key={l.href}
               href={l.href}
-              className="text-sm font-medium text-[#10201F]/80 hover:text-[#07543F] transition-colors"
+              className="text-xs font-bold tracking-wide uppercase text-[#10201F]/80 hover:text-[#07543F] transition-colors"
             >
               {l.label}
             </Link>

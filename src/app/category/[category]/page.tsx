@@ -91,11 +91,7 @@ export default function CategoryPage() {
       </div>
 
       {/* Filter / Sort bar */}
-      <div className="p-4 rounded-xl bg-white border border-[#E2DED5] shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <div className="text-xs text-[#667085]">
-          Showing <strong className="text-[#10201F]">{sortedProducts.length}</strong> {sortedProducts.length === 1 ? "item" : "items"} in {categorySlug.toUpperCase()}
-        </div>
-
+      <div className="p-3 rounded-xl bg-white border border-[#E2DED5] shadow-xs flex items-center justify-end">
         <div className="flex items-center gap-2">
           <span className="text-xs font-bold text-[#10201F]">Sort By:</span>
           <select
