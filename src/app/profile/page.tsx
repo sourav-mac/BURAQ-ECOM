@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { LogOut, ShoppingBag, Store, Camera } from "lucide-react";
 import { UserAvatar } from "@/components/UserAvatar";
 import { useAuth } from "@/context/AuthContext";
+import { clean, check, validate, fieldErrorCls } from "@/lib/validation";
 import { useCart } from "@/context/CartContext";
 
 const inputCls =
@@ -31,6 +32,7 @@ export default function ProfilePage() {
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<"name" | "phone", string>>>({});
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
@@ -45,8 +47,10 @@ export default function ProfilePage() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) return;
-    const res = await updateProfile({ name: name.trim(), phone: phone.trim() });
+    const errs = validate({ name: check.name(name), phone: check.phone(phone, false) });
+    setFieldErrors(errs ?? {});
+    if (errs) return;
+    const res = await updateProfile({ name: name.trim(), phone });
     if (!res.success) {
       alert(res.message || "Could not save your profile");
       return;
@@ -59,6 +63,7 @@ export default function ProfilePage() {
   const handleCancel = () => {
     setName(user.name);
     setPhone(user.phone || "");
+    setFieldErrors({});
     setEditing(false);
   };
 
@@ -170,7 +175,10 @@ export default function ProfilePage() {
           <form onSubmit={handleSave} className="mt-4 divide-y divide-[#EFECE3] border-y border-[#EFECE3]">
             <div className="py-3 grid sm:grid-cols-[140px_1fr] items-center gap-1 sm:gap-4">
               <label className={labelCls}>Full name</label>
-              <input value={name} onChange={(e) => setName(e.target.value)} disabled={!editing} className={inputCls} />
+              <div>
+                <input value={name} onChange={(e) => setName(clean.name(e.target.value))} disabled={!editing} maxLength={60} autoComplete="name" className={inputCls} />
+                {fieldErrors.name && <p className={fieldErrorCls}>{fieldErrors.name}</p>}
+              </div>
             </div>
             <div className="py-3 grid sm:grid-cols-[140px_1fr] items-center gap-1 sm:gap-4">
               <label className={labelCls}>Email</label>
@@ -178,13 +186,19 @@ export default function ProfilePage() {
             </div>
             <div className="py-3 grid sm:grid-cols-[140px_1fr] items-center gap-1 sm:gap-4">
               <label className={labelCls}>Phone</label>
-              <input
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                disabled={!editing}
-                placeholder={editing ? "Add phone number" : "Not added"}
-                className={inputCls}
-              />
+              <div>
+                <input
+                  value={phone}
+                  onChange={(e) => setPhone(clean.phone(e.target.value))}
+                  disabled={!editing}
+                  inputMode="numeric"
+                  maxLength={10}
+                  autoComplete="tel-national"
+                  placeholder={editing ? "10-digit mobile number" : "Not added"}
+                  className={inputCls}
+                />
+                {fieldErrors.phone && <p className={fieldErrorCls}>{fieldErrors.phone}</p>}
+              </div>
             </div>
 
             {editing && (

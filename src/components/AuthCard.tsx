@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { signIn as nextAuthSignIn } from "next-auth/react";
 import { useAuth } from "@/context/AuthContext";
+import { clean, check, validate, fieldErrorCls } from "@/lib/validation";
 
 type Mode = "login" | "signup";
 
@@ -25,6 +26,7 @@ export function AuthCard({ initialMode }: { initialMode: Mode }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<"name" | "phone" | "email" | "password", string>>>({});
 
   const isSignup = mode === "signup";
 
@@ -32,6 +34,7 @@ export function AuthCard({ initialMode }: { initialMode: Mode }) {
     const next: Mode = isSignup ? "login" : "signup";
     setMode(next);
     setError(null);
+    setFieldErrors({});
     window.history.replaceState(null, "", (next === "signup" ? "/signup" : "/signin") + window.location.search);
   };
 
@@ -42,8 +45,15 @@ export function AuthCard({ initialMode }: { initialMode: Mode }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim() || !password || (isSignup && !name.trim())) {
-      setError("Please fill in all required fields.");
+    const errs = validate({
+      name: isSignup ? check.name(name) : null,
+      phone: isSignup ? check.phone(phone, false) : null,
+      email: check.email(email),
+      password: check.password(password, isSignup),
+    });
+    setFieldErrors(errs ?? {});
+    if (errs) {
+      setError(null);
       return;
     }
     setIsLoading(true);
@@ -148,10 +158,13 @@ export function AuthCard({ initialMode }: { initialMode: Mode }) {
                       type="text"
                       value={name}
                       tabIndex={isSignup ? 0 : -1}
-                      onChange={(e) => setName(e.target.value)}
+                      onChange={(e) => setName(clean.name(e.target.value))}
                       placeholder="Your name"
+                      autoComplete="name"
+                      maxLength={60}
                       className={inputCls}
                     />
+                    {fieldErrors.name && <p className={fieldErrorCls}>{fieldErrors.name}</p>}
                   </div>
                   <div>
                     <label className={labelCls}>Phone</label>
@@ -159,10 +172,14 @@ export function AuthCard({ initialMode }: { initialMode: Mode }) {
                       type="tel"
                       value={phone}
                       tabIndex={isSignup ? 0 : -1}
-                      onChange={(e) => setPhone(e.target.value)}
+                      onChange={(e) => setPhone(clean.phone(e.target.value))}
                       placeholder="Optional"
+                      inputMode="numeric"
+                      autoComplete="tel-national"
+                      maxLength={10}
                       className={inputCls}
                     />
+                    {fieldErrors.phone && <p className={fieldErrorCls}>{fieldErrors.phone}</p>}
                   </div>
                 </div>
               </div>
@@ -173,10 +190,13 @@ export function AuthCard({ initialMode }: { initialMode: Mode }) {
               <input
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value.replace(/\s/g, ""))}
+                onChange={(e) => setEmail(clean.email(e.target.value))}
                 placeholder="you@example.com"
+                autoComplete="email"
+                maxLength={100}
                 className={inputCls}
               />
+              {fieldErrors.email && <p className={fieldErrorCls}>{fieldErrors.email}</p>}
             </div>
 
             <div>
@@ -186,7 +206,9 @@ export function AuthCard({ initialMode }: { initialMode: Mode }) {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder={isSignup ? "Min. 6 characters" : "••••••••"}
+                  placeholder={isSignup ? "Min. 6 characters, letters + numbers" : "••••••••"}
+                  autoComplete={isSignup ? "new-password" : "current-password"}
+                  maxLength={128}
                   className={`${inputCls} pr-10`}
                 />
                 <button
@@ -198,6 +220,7 @@ export function AuthCard({ initialMode }: { initialMode: Mode }) {
                   {showPassword ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                 </button>
               </div>
+              {fieldErrors.password && <p className={fieldErrorCls}>{fieldErrors.password}</p>}
             </div>
 
             {error && <p className="text-xs font-medium text-[#C2410C] -mt-1">{error}</p>}

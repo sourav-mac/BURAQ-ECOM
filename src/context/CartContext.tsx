@@ -30,23 +30,32 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  // Don't write to storage until the saved cart has been restored — otherwise the
+  // initial empty cart overwrites it on refresh (and React Strict Mode re-runs effects).
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     try {
       const saved = localStorage.getItem(CART_KEY);
-      if (saved) setItems(JSON.parse(saved));
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) setItems(parsed.filter((i) => i?.product?.id && i.quantity > 0));
+      }
     } catch (e) {
       console.warn("Failed to load cart", e);
+    } finally {
+      setHydrated(true);
     }
   }, []);
 
   useEffect(() => {
+    if (!hydrated) return;
     try {
       localStorage.setItem(CART_KEY, JSON.stringify(items));
     } catch (e) {
       console.warn("Failed to persist cart", e);
     }
-  }, [items]);
+  }, [items, hydrated]);
 
   const addToCart = (product: Product, quantity = 1) => {
     setItems((prev) => {

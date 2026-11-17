@@ -8,12 +8,11 @@ import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { api, inr } from "@/lib/api";
 import { ProductImage } from "@/components/ProductImage";
+import { clean, check, validate, fieldErrorCls, GSTIN_RE } from "@/lib/validation";
 
 const inputCls =
   "w-full h-9 px-3 rounded-lg border border-[#E2DED5] bg-transparent text-xs text-[#10201F] placeholder:text-[#9AA19C] focus:outline-none focus:border-[#07543F] focus:ring-1 focus:ring-[#07543F]/20";
 const labelCls = "block text-[11px] font-bold text-[#445048] mb-1";
-
-const GSTIN_RE = /^\d{2}[A-Z]{5}\d{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/;
 
 const STATES = [
   "West Bengal", "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Delhi", "Goa",
@@ -31,8 +30,22 @@ export default function CheckoutPage() {
   );
 
   const [form, setForm] = useState({ fullName: "", phone: "", address: "", city: "", state: "West Bengal", pincode: "", gstin: "" });
-  const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-    setForm({ ...form, [k]: e.target.value });
+  type FormKey = keyof typeof form;
+  const CLEANERS: Partial<Record<FormKey, (v: string) => string>> = {
+    fullName: clean.name,
+    phone: clean.phone,
+    address: clean.address,
+    city: clean.city,
+    pincode: clean.pincode,
+    gstin: clean.gstin,
+  };
+  const set = (k: FormKey) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const v = CLEANERS[k] ? CLEANERS[k]!(e.target.value) : e.target.value;
+    setForm((f) => ({ ...f, [k]: v }));
+    if (fieldErrors[k]) setFieldErrors((fe) => ({ ...fe, [k]: undefined }));
+  };
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<FormKey, string>>>({});
+  const err = (k: FormKey) => (fieldErrors[k] ? <p className={fieldErrorCls}>{fieldErrors[k]}</p> : null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,8 +60,8 @@ export default function CheckoutPage() {
   useEffect(() => {
     if (!user) return;
     setForm((f) => ({
-      fullName: f.fullName || user.name,
-      phone: f.phone || user.phone || "",
+      fullName: f.fullName || clean.name(user.name),
+      phone: f.phone || clean.phone(user.phone || ""),
       address: f.address || user.address || "",
       city: f.city || user.city || "",
       state: user.state || f.state,
@@ -60,9 +73,17 @@ export default function CheckoutPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (items.length === 0 || isSubmitting) return;
-    if (!/^\d{6}$/.test(form.pincode)) return setError("Enter a valid 6-digit PIN code.");
-    if (form.phone.replace(/\D/g, "").length < 10) return setError("Enter a valid 10-digit mobile number.");
-    if (form.gstin && !GSTIN_RE.test(form.gstin)) return setError("Enter a valid 15-character GSTIN, or leave it empty.");
+    const errs = validate({
+      fullName: check.name(form.fullName),
+      phone: check.phone(form.phone),
+      address: check.address(form.address),
+      city: check.city(form.city),
+      pincode: check.pincode(form.pincode),
+      gstin: check.gstin(form.gstin),
+      state: form.state ? null : "Choose your state.",
+    });
+    setFieldErrors(errs ?? {});
+    if (errs) return setError("Please fix the highlighted fields.");
     setIsSubmitting(true);
     setError(null);
     try {
@@ -172,11 +193,13 @@ export default function CheckoutPage() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
               <div>
                 <label className={labelCls}>Full Name *</label>
-                <input required value={form.fullName} onChange={set("fullName")} placeholder="Rajesh Kumar" className={inputCls} />
+                <input value={form.fullName} onChange={set("fullName")} placeholder="Rajesh Kumar" autoComplete="name" maxLength={60} className={inputCls} />
+                {err("fullName")}
               </div>
               <div>
                 <label className={labelCls}>Mobile Number *</label>
-                <input required type="tel" value={form.phone} onChange={set("phone")} placeholder="98300 00000" className={inputCls} />
+                <input type="tel" inputMode="numeric" value={form.phone} onChange={set("phone")} placeholder="9830000000" autoComplete="tel-national" maxLength={10} className={inputCls} />
+                {err("phone")}
               </div>
               <div>
                 <label className={labelCls}>Email Address</label>
@@ -191,14 +214,16 @@ export default function CheckoutPage() {
             </label>
             <input
               value={form.gstin}
-              onChange={(e) => setForm({ ...form, gstin: e.target.value.toUpperCase().replace(/[^0-9A-Z]/g, "").slice(0, 15) })}
+              onChange={set("gstin")}
               placeholder="19ABCDE1234F1Z5"
               maxLength={15}
               className={`${inputCls} sm:max-w-[calc(66.666%-0.3rem)] font-mono tracking-wide`}
             />
-            {form.gstin && form.gstin.length === 15 && !GSTIN_RE.test(form.gstin) && (
-              <p className="mt-1 text-[11px] text-[#C2410C]">This doesn&apos;t look like a valid GSTIN.</p>
-            )}
+            {fieldErrors.gstin
+              ? err("gstin")
+              : form.gstin && form.gstin.length === 15 && !GSTIN_RE.test(form.gstin) && (
+                  <p className={fieldErrorCls}>This doesn&apos;t look like a valid GSTIN.</p>
+                )}
           </div>
 
           <div className="py-3 border-t border-[#EFECE3]">
@@ -206,11 +231,13 @@ export default function CheckoutPage() {
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-2.5">
               <div className="sm:col-span-4">
                 <label className={labelCls}>Street Address / House No. *</label>
-                <input required value={form.address} onChange={set("address")} placeholder="House no, street, landmark" className={inputCls} />
+                <input value={form.address} onChange={set("address")} placeholder="House no, street, landmark" autoComplete="street-address" maxLength={200} className={inputCls} />
+                {err("address")}
               </div>
               <div className="sm:col-span-2">
                 <label className={labelCls}>City / Town *</label>
-                <input required value={form.city} onChange={set("city")} placeholder="Kolkata" className={inputCls} />
+                <input value={form.city} onChange={set("city")} placeholder="Kolkata" autoComplete="address-level2" maxLength={50} className={inputCls} />
+                {err("city")}
               </div>
               <div>
                 <label className={labelCls}>State *</label>
@@ -223,14 +250,15 @@ export default function CheckoutPage() {
               <div>
                 <label className={labelCls}>PIN Code *</label>
                 <input
-                  required
                   inputMode="numeric"
                   maxLength={6}
                   value={form.pincode}
-                  onChange={(e) => setForm({ ...form, pincode: e.target.value.replace(/\D/g, "") })}
+                  onChange={set("pincode")}
                   placeholder="700001"
+                  autoComplete="postal-code"
                   className={inputCls}
                 />
+                {err("pincode")}
               </div>
             </div>
           </div>

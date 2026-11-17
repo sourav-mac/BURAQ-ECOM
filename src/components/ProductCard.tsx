@@ -33,6 +33,10 @@ export function ProductCard({ product }: { product: Product }) {
           <span className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded text-[10px] font-bold bg-[#D96B1F] text-white">
             Few left
           </span>
+        ) : product.discountPercent > 0 ? (
+          <span className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded text-[10px] font-bold bg-[#07543F] text-white">
+            {product.discountPercent}% OFF
+          </span>
         ) : null}
       </Link>
 
@@ -52,8 +56,17 @@ export function ProductCard({ product }: { product: Product }) {
 
         <div className="pt-2.5 border-t border-[#E2DED5] flex items-center justify-between gap-2">
           <div>
-            <div className="text-base font-black text-[#07543F]">{inr(product.price)}</div>
-            <div className="text-[10px] text-[#667085]">per {product.unit.toLowerCase()} · incl. GST</div>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-base font-black text-[#07543F]">{inr(product.price)}</span>
+              {product.printedMrp && (
+                <span className="text-[11px] text-[#9AA19C] line-through" title="MRP printed on the package">
+                  {inr(product.printedMrp)}
+                </span>
+              )}
+            </div>
+            <div className="text-[10px] text-[#667085]">
+              {product.printedMrp ? "MRP " : ""}per {product.unit.toLowerCase()} · incl. GST
+            </div>
           </div>
           <button
             onClick={handleAddToCart}

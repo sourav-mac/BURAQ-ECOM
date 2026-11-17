@@ -28,7 +28,7 @@ import { UserAvatar } from "./UserAvatar";
 export function Navbar() {
   const pathname = usePathname();
   const { totalItems, setIsCartOpen } = useCart();
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading: authLoading } = useAuth();
   const { searchTerm, setSearchTerm, sortOption, setSortOption } = useFilter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -45,20 +45,9 @@ export function Navbar() {
     return Package;
   };
 
-  // Fallback categories list if backend categories haven't loaded yet
-  const defaultCategoryList = [
-    { id: "lighting", name: "Lighting" },
-    { id: "wire", name: "Wire" },
-    { id: "fan", name: "Fan" },
-    { id: "mcb", name: "MCB" },
-    { id: "switch", name: "Switch" },
-    { id: "accessories", name: "Accessories" },
-    { id: "wall-lamp", name: "Wall Lamp" },
-    { id: "hanging-lamp", name: "Hanging Lamp" },
-    { id: "ceiling-light", name: "Ceiling Light" },
-  ];
-
-  const activeCategories = categories.length > 0 ? categories : defaultCategoryList;
+  // Real categories only (cached in the browser, so they show instantly after the first visit).
+  // No hard-coded fallback list — that caused items to swap/jump on refresh.
+  const activeCategories = categories;
   const primaryCategories = activeCategories.slice(0, 5);
   const overflowCategories = activeCategories.slice(5);
 
@@ -147,7 +136,12 @@ export function Navbar() {
 
         {/* Desktop nav links - compact category pills */}
         <nav className="hidden lg:flex items-center gap-1">
-          {navLinks.map((l) => {
+          {/* First-ever visit only: quiet placeholders while categories load */}
+          {!categories.loaded &&
+            [56, 64, 52, 60].map((w, i) => (
+              <span key={i} className="h-7 rounded-full bg-[#10201F]/5 animate-pulse" style={{ width: w }} />
+            ))}
+          {categories.loaded && navLinks.map((l) => {
             const isActive =
               pathname === l.href ||
               (l.href === "/products" && pathname === "/") ||
@@ -220,7 +214,10 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
-          {user ? (
+          {authLoading && !user ? (
+            // Still checking the saved login — don't flash "Sign in"
+            <span className="hidden sm:block w-24 h-9 rounded-full bg-[#10201F]/5 animate-pulse" />
+          ) : user ? (
             <div
               className="relative hidden sm:block group"
               onMouseEnter={() => setUserMenuOpen(true)}

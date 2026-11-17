@@ -18,7 +18,11 @@ export interface Product {
   unit: string;
   description: string | null;
   gstPercent: number;
-  price: number; // MRP, GST-inclusive
+  price: number; // BURAQ selling price, GST-inclusive
+  /** Real MRP printed on the package (Worklane) — only set when higher than `price` */
+  printedMrp: number | null;
+  /** % below the printed MRP (0 when there is no printed MRP above the price) */
+  discountPercent: number;
   inStock: boolean;
   stockStatus: "IN_STOCK" | "LOW_STOCK" | "OUT_OF_STOCK";
   category: { id: string; name: string };

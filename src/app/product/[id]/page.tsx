@@ -94,7 +94,16 @@ export default function ProductDetailPage() {
 
           <div className="flex items-baseline gap-3 py-2 border-y border-[#E2DED5]">
             <span className="text-3xl font-black text-[#07543F]">{inr(product.price)}</span>
-            <span className="text-xs text-[#667085]">per {product.unit.toLowerCase()}</span>
+            {product.printedMrp ? (
+              <>
+                <span className="text-sm text-[#9AA19C]">
+                  MRP <span className="line-through">{inr(product.printedMrp)}</span>
+                </span>
+                <span className="text-xs font-bold text-[#D96B1F]">{product.discountPercent}% off</span>
+              </>
+            ) : (
+              <span className="text-xs text-[#667085]">per {product.unit.toLowerCase()}</span>
+            )}
             <span className="text-xs text-[#667085] ml-auto font-medium">GST Inclusive</span>
           </div>
 

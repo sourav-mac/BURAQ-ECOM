@@ -22,27 +22,51 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const errMsg = (e: unknown, fallback: string) => (e instanceof Error ? e.message : fallback);
 
+const USER_CACHE_KEY = "buraq_shop_user";
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { data: session, status: sessionStatus } = useSession();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Restore session from stored token or NextAuth Google session
+  // 1) Existing BURAQ login: show the cached user instantly (no "Sign in" flash on refresh),
+  //    then re-validate with the backend in the background. Doesn't wait for NextAuth.
   useEffect(() => {
+    if (!tokenStore.get()) return;
+    try {
+      const cached = localStorage.getItem(USER_CACHE_KEY);
+      if (cached) {
+        setUser(JSON.parse(cached));
+        setIsLoading(false);
+      }
+    } catch {}
+    api
+      .me()
+      .then(setUser)
+      .catch((e) => {
+        // Only log out when the token is really invalid — not on a network hiccup
+        if (e?.status === 401 || e?.status === 403 || e?.status === 404) {
+          tokenStore.clear();
+          setUser(null);
+        }
+      })
+      .finally(() => setIsLoading(false));
+  }, []);
+
+  // Keep the cached copy in sync with the signed-in user
+  useEffect(() => {
+    try {
+      if (user) localStorage.setItem(USER_CACHE_KEY, JSON.stringify(user));
+      else if (!tokenStore.get()) localStorage.removeItem(USER_CACHE_KEY);
+    } catch {}
+  }, [user]);
+
+  // 2) Fresh Google sign-in (no BURAQ token yet): wait for NextAuth, then exchange
+  //    the verified Google ID token for a BURAQ customer login.
+  useEffect(() => {
+    if (tokenStore.get()) return; // handled above
     if (sessionStatus === "loading") return;
 
-    // Existing BURAQ login (email/password or an earlier Google exchange)
-    if (tokenStore.get()) {
-      api
-        .me()
-        .then(setUser)
-        .catch(() => tokenStore.clear())
-        .finally(() => setIsLoading(false));
-      return;
-    }
-
-    // Fresh Google sign-in: exchange the verified Google ID token for a BURAQ
-    // customer login, so the customer is created in the backend (Retail) and can order.
     const idToken = (session as any)?.idToken as string | undefined;
     if (idToken) {
       api
@@ -60,16 +84,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    if (!tokenStore.get()) {
-      setIsLoading(false);
-      return;
-    }
-
-    api
-      .me()
-      .then(setUser)
-      .catch(() => tokenStore.clear())
-      .finally(() => setIsLoading(false));
+    setIsLoading(false); // not signed in
   }, [session, sessionStatus]);
 
   const login = useCallback(async (email: string, pass: string): Promise<Result> => {
