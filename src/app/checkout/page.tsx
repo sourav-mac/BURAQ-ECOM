@@ -71,7 +71,7 @@ export default function CheckoutPage() {
 
         <Link
           href="/"
-          className="inline-flex px-6 py-3 rounded-xl bg-[#07543F] text-[#FFFDEB] font-bold text-xs uppercase tracking-wider hover:bg-[#053E2E] transition-colors"
+          className="inline-flex px-6 py-3 rounded-xl bg-[#07543F] text-[#FFFDEB] font-bold text-xs uppercase tracking-wider"
         >
           Return to Store
         </Link>
@@ -96,7 +96,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full space-y-8">
-      <Link href="/products" className="inline-flex items-center gap-1.5 text-xs text-[#667085] hover:text-[#10201F] transition-colors">
+      <Link href="/products" className="inline-flex items-center gap-1.5 text-xs text-[#667085]">
         <ArrowLeft className="w-4 h-4" />
         <span>Continue Shopping</span>
       </Link>
@@ -195,10 +195,10 @@ export default function CheckoutPage() {
             <div className="space-y-3">
               <label
                 onClick={() => setFormData({ ...formData, paymentMethod: "ONLINE" })}
-                className={`p-4 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
+                className={`p-4 rounded-xl border flex items-center justify-between cursor-pointer ${
                   formData.paymentMethod === "ONLINE"
                     ? "bg-[#FFFDEB] border-[#07543F]"
-                    : "bg-[#FFFDEB]/40 border-[#E2DED5] hover:border-[#E2DED5]/80"
+                    : "bg-[#FFFDEB]/40 border-[#E2DED5]"
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -217,10 +217,10 @@ export default function CheckoutPage() {
 
               <label
                 onClick={() => setFormData({ ...formData, paymentMethod: "COD" })}
-                className={`p-4 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
+                className={`p-4 rounded-xl border flex items-center justify-between cursor-pointer ${
                   formData.paymentMethod === "COD"
                     ? "bg-[#FFFDEB] border-[#07543F]"
-                    : "bg-[#FFFDEB]/40 border-[#E2DED5] hover:border-[#E2DED5]/80"
+                    : "bg-[#FFFDEB]/40 border-[#E2DED5]"
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -242,7 +242,7 @@ export default function CheckoutPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-4 rounded-xl bg-[#07543F] hover:bg-[#053E2E] text-[#FFFDEB] font-black uppercase tracking-wider text-sm flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer disabled:opacity-50"
+            className="w-full py-4 rounded-xl bg-[#07543F] text-[#FFFDEB] font-black uppercase tracking-wider text-sm flex items-center justify-center gap-2 shadow-xs cursor-pointer disabled:opacity-50"
           >
             {isSubmitting ? (
               <span>Processing Order...</span>

@@ -8,16 +8,26 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      fontFamily: { sans: ["var(--font-jakarta)", "sans-serif"] },
+      fontFamily: {
+        sans: ["var(--font-jakarta)", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
+      },
       colors: {
         buraq: {
-          bg: "#FFFDEB", // 60% Dominant Background
-          surface: "#FFFFFF", // Slightly elevated card background
-          content: "#10201F", // 30% Content & Body text
-          important: "#07543F", // 10% Highlight & Accent
-          "important-hover": "#053E2E",
-          border: "#E2DED5",
+          primary: "#07543F",
+          "primary-hover": "#053E2E",
+          "primary-light": "#0A7255",
+          dark: "#10201F",
+          "dark-soft": "#162C2A",
+          accent: "#D96B1F",
+          "accent-hover": "#BE5A16",
+          "accent-light": "#FDEEE5",
+          bg: "#FFFDEB",
+          "bg-alt": "#FAF8E4",
+          surface: "#FFFFFF",
+          sage: "#E7F1EB",
+          "sage-dark": "#D2E4D8",
           muted: "#667085",
+          border: "#E2DED5",
         },
       },
     },

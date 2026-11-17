@@ -57,10 +57,10 @@ export default function ProductsCatalogPage() {
             <button
               key={c.id}
               onClick={() => setSelectedCategory(c.id)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap cursor-pointer ${
                 selectedCategory === c.id
                   ? "bg-[#07543F] text-[#FFFDEB]"
-                  : "bg-[#FFFDEB] text-[#10201F] hover:text-[#10201F] hover:bg-[#F2F7F4]"
+                  : "bg-[#FAF8E4] text-[#10201F]"
               }`}
             >
               {c.label}

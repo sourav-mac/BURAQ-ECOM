@@ -106,7 +106,7 @@ export default function SignUpPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 rounded-xl bg-[#07543F] hover:bg-[#053E2E] text-[#FFFDEB] text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer disabled:opacity-50"
+            className="w-full py-3.5 rounded-xl bg-[#07543F] text-[#FFFDEB] text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-xs cursor-pointer disabled:opacity-50"
           >
             {loading ? "Creating Account..." : "Create Account"}
             <ArrowRight className="w-4 h-4" />
@@ -115,7 +115,7 @@ export default function SignUpPage() {
 
         <div className="text-center pt-2 text-xs text-[#667085] border-t border-[#E2DED5]">
           Already have an account?{" "}
-          <Link href="/signin" className="text-[#07543F] font-bold hover:underline">
+          <Link href="/signin" className="text-[#07543F] font-bold">
             Sign In Here
           </Link>
         </div>

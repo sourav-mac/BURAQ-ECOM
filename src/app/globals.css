@@ -24,21 +24,10 @@
   }
 }
 
-/* 60-30-10 Themed Surface panels */
+/* Buraq Theme Cards - Clean, solid, no hover movement */
 .buraq-card {
   background: #FFFFFF;
   border: 1px solid #E2DED5;
-}
-
-.buraq-card-hover {
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.buraq-card-hover:hover {
-  background: #F2F7F4;
-  border-color: #07543F;
-  transform: translateY(-2px);
-  box-shadow: 0 10px 24px -6px rgba(7, 84, 63, 0.12);
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -51,7 +40,4 @@
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: #E2DED5;
   border-radius: 9999px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #07543F;
 }

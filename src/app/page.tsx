@@ -27,8 +27,8 @@ export default function HomePage() {
           </h1>
         </div>
 
-        {/* Filter Tabs */}
-        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#FFFFFF] border border-[#E2DED5] overflow-x-auto">
+        {/* Filter Tabs - strictly no hover effects */}
+        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-white border border-[#E2DED5] overflow-x-auto">
           {(
             [
               { id: "all", label: "All Items" },
@@ -40,10 +40,10 @@ export default function HomePage() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap cursor-pointer ${
                 activeTab === tab.id
-                  ? "bg-[#07543F] text-[#FFFDEB] font-bold shadow-sm"
-                  : "text-[#10201F] hover:text-[#10201F] hover:bg-[#F2F7F4]"
+                  ? "bg-[#07543F] text-[#FFFDEB] font-bold shadow-xs"
+                  : "text-[#10201F] bg-white"
               }`}
             >
               {tab.label}

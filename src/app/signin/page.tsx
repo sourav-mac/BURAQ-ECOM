@@ -68,7 +68,7 @@ export default function SignInPage() {
           <div className="space-y-1.5">
             <div className="flex justify-between items-center">
               <label className="text-xs font-bold text-[#10201F]">Password</label>
-              <span className="text-[11px] text-[#07543F] hover:underline cursor-pointer">
+              <span className="text-[11px] text-[#07543F] cursor-pointer">
                 Forgot password?
               </span>
             </div>
@@ -78,14 +78,14 @@ export default function SignInPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full px-4 py-3 rounded-xl bg-[#FFFDEB] border border-[#E2DED5] text-xs text-[#10201F] placeholder:text-[#667085]/50 focus:outline-none focus:border-[#07543F]"
+              className="w-full px-4 py-3 rounded-xl bg-[#FAF8E4] border border-[#E2DED5] text-xs text-[#10201F] placeholder:text-[#667085]/50 focus:outline-none focus:border-[#07543F]"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 rounded-xl bg-[#07543F] hover:bg-[#053E2E] text-[#FFFDEB] text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer disabled:opacity-50"
+            className="w-full py-3.5 rounded-xl bg-[#07543F] text-[#FFFDEB] text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-xs cursor-pointer disabled:opacity-50"
           >
             {loading ? "Signing in..." : "Sign In"}
             <ArrowRight className="w-4 h-4" />
@@ -94,7 +94,7 @@ export default function SignInPage() {
 
         <div className="text-center pt-2 text-xs text-[#667085] border-t border-[#E2DED5]">
           Don&apos;t have an account yet?{" "}
-          <Link href="/signup" className="text-[#07543F] font-bold hover:underline">
+          <Link href="/signup" className="text-[#07543F] font-bold">
             Create an Account
           </Link>
         </div>
