@@ -1,12 +1,25 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
+import { ShoppingCart } from "lucide-react";
 import { Product } from "@/data/products";
+import { useCart } from "@/context/CartContext";
 
 export function ProductCard({ product }: { product: Product }) {
+  const { addToCart, setIsCartOpen } = useCart();
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addToCart(product, 1);
+    setIsCartOpen(true);
+  };
+
   return (
     <div className="rounded-2xl buraq-card flex flex-col overflow-hidden shadow-xs">
       {/* Full Edge-to-Edge Image (No inner padding, no borders) */}
-      <div className="relative aspect-square w-full overflow-hidden bg-[#FAF8E4]">
+      <Link href={`/product/${product.slug}`} className="block relative aspect-square w-full overflow-hidden bg-[#FAF8E4]">
         <img
           src={product.image}
           alt={product.name}
@@ -18,7 +31,7 @@ export function ProductCard({ product }: { product: Product }) {
             {product.discountPercent}% OFF
           </span>
         )}
-      </div>
+      </Link>
 
       {/* Info Block */}
       <div className="p-4 flex-1 flex flex-col justify-between space-y-3 bg-white">
@@ -55,12 +68,13 @@ export function ProductCard({ product }: { product: Product }) {
             )}
           </div>
 
-          <Link
-            href={`/product/${product.slug}`}
-            className="px-4 py-2 rounded-xl bg-[#07543F] text-[#FFFDEB] text-xs font-bold shadow-xs text-center"
+          <button
+            onClick={handleAddToCart}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#07543F] text-[#FFFDEB] text-xs font-bold shadow-xs cursor-pointer active:scale-95 transition-transform"
           >
-            View
-          </Link>
+            <ShoppingCart className="w-3.5 h-3.5 stroke-[2.2]" />
+            <span>Add to Cart</span>
+          </button>
         </div>
       </div>
     </div>
