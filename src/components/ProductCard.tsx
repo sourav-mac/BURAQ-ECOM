@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
 import { Product } from "@/data/products";
@@ -8,11 +8,14 @@ import { useCart } from "@/context/CartContext";
 
 export function ProductCard({ product }: { product: Product }) {
   const { addToCart } = useCart();
+  const [added, setAdded] = useState(false);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     addToCart(product, 1);
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1500);
   };
 
   return (
@@ -72,7 +75,7 @@ export function ProductCard({ product }: { product: Product }) {
             className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#07543F] text-[#FFFDEB] text-xs font-bold shadow-xs cursor-pointer active:scale-95 transition-transform"
           >
             <ShoppingCart className="w-3.5 h-3.5 stroke-[2.2]" />
-            <span>Add to Cart</span>
+            <span>{added ? "Added ✓" : "Add to Cart"}</span>
           </button>
         </div>
       </div>
