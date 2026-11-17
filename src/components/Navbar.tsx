@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ShoppingBag, Menu, X } from "lucide-react";
+import { ShoppingCart, Menu, X } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 
@@ -40,46 +40,46 @@ export function Navbar() {
           />
         </Link>
 
-        {/* Right Action Icons: Cart, Auth & Shop */}
-        <div className="flex items-center gap-3">
-          {/* Cart Icon Trigger */}
+        {/* Right Action Area: Sign In & Proper Cart Icon (No boxy bg) */}
+        <div className="flex items-center gap-5">
+          {/* User Sign In / Profile */}
+          {user ? (
+            <Link
+              href="/account"
+              className="flex items-center gap-2 text-xs font-bold text-[#10201F]"
+            >
+              <div className="w-7 h-7 rounded-full bg-[#07543F] text-[#FFFDEB] flex items-center justify-center text-xs font-bold">
+                {user.name.slice(0, 1).toUpperCase()}
+              </div>
+              <span className="hidden sm:inline-block max-w-[100px] truncate">{user.name}</span>
+            </Link>
+          ) : (
+            <Link
+              href="/signin"
+              className="hidden sm:inline-flex text-xs font-bold tracking-wider uppercase text-[#10201F] px-1 py-1 cursor-pointer"
+            >
+              Sign In
+            </Link>
+          )}
+
+          {/* Proper Shopping Cart Icon without bulky bg box */}
           <button
             onClick={() => setIsCartOpen(true)}
-            className="relative p-2.5 rounded-xl bg-white border border-[#E2DED5] text-[#10201F] cursor-pointer"
+            className="relative p-1.5 text-[#10201F] cursor-pointer flex items-center justify-center"
             aria-label="Shopping Cart"
           >
-            <ShoppingBag className="w-4 h-4" />
+            <ShoppingCart className="w-6 h-6 stroke-[1.8]" />
             {totalItems > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1 bg-[#D96B1F] text-white text-[10px] font-black rounded-full flex items-center justify-center shadow-xs">
+              <span className="absolute -top-1 -right-1.5 min-w-[18px] h-[18px] px-1 bg-[#D96B1F] text-white text-[10px] font-black rounded-full flex items-center justify-center">
                 {totalItems}
               </span>
             )}
           </button>
 
-          {/* User Sign In / Profile */}
-          {user ? (
-            <Link
-              href="/account"
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-[#E2DED5] text-[#10201F] text-xs font-bold"
-            >
-              <div className="w-5 h-5 rounded-full bg-[#07543F] text-[#FFFDEB] flex items-center justify-center text-[10px] font-bold">
-                {user.name.slice(0, 1).toUpperCase()}
-              </div>
-              <span className="hidden sm:inline-block max-w-[90px] truncate">{user.name}</span>
-            </Link>
-          ) : (
-            <Link
-              href="/signin"
-              className="hidden sm:flex items-center px-3.5 py-2 rounded-xl bg-white border border-[#E2DED5] text-[#10201F] text-xs font-bold cursor-pointer"
-            >
-              <span>Sign In</span>
-            </Link>
-          )}
-
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="sm:hidden p-2 rounded-xl bg-white border border-[#E2DED5] text-[#10201F] cursor-pointer"
+            className="sm:hidden p-1.5 text-[#10201F] cursor-pointer"
             aria-label="Toggle Navigation"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
