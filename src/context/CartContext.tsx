@@ -1,7 +1,8 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef } from "react";
 import { Product } from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
 
 export interface CartItem {
   product: Product;
@@ -23,39 +24,87 @@ interface CartContextType {
   setIsCartOpen: (open: boolean) => void;
 }
 
-const CART_KEY = "buraq_shop_cart_v2"; // v2: real products from backend
+/**
+ * One cart per account (saved in this browser), plus a guest cart for logged-out browsing.
+ * Previously a single shared key leaked one account's cart into the next login.
+ */
+const GUEST_KEY = "buraq_cart_guest";
+const userKey = (userId: string) => `buraq_cart_user_${userId}`;
+const LEGACY_SHARED_KEY = "buraq_shop_cart_v2"; // old shared cart — owner unknown, so it's discarded
+
+function readCart(key: string): CartItem[] {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(key) || "[]");
+    return Array.isArray(parsed) ? parsed.filter((i) => i?.product?.id && i.quantity > 0) : [];
+  } catch {
+    return [];
+  }
+}
+
+function mergeCarts(base: CartItem[], extra: CartItem[]): CartItem[] {
+  const out = base.map((i) => ({ ...i }));
+  for (const e of extra) {
+    const hit = out.find((i) => i.product.id === e.product.id);
+    if (hit) hit.quantity += e.quantity;
+    else out.push({ ...e });
+  }
+  return out;
+}
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
+  const { user, isLoading: authLoading } = useAuth();
   const [items, setItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  // Don't write to storage until the saved cart has been restored — otherwise the
-  // initial empty cart overwrites it on refresh (and React Strict Mode re-runs effects).
-  const [hydrated, setHydrated] = useState(false);
+  // Storage key the current `items` belong to. Nothing is written until it's set,
+  // so the initial empty cart never overwrites a saved one.
+  const [activeKey, setActiveKey] = useState<string | null>(null);
+  const loadedKeyRef = useRef<string | null>(null); // updated synchronously (Strict Mode re-runs effects)
 
+  // Load the right cart whenever the signed-in account changes (login / logout / switch)
   useEffect(() => {
+    if (authLoading) return;
     try {
-      const saved = localStorage.getItem(CART_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) setItems(parsed.filter((i) => i?.product?.id && i.quantity > 0));
+      localStorage.removeItem(LEGACY_SHARED_KEY);
+    } catch {}
+
+    const key = user ? userKey(user.id) : GUEST_KEY;
+    if (key === loadedKeyRef.current) return;
+    loadedKeyRef.current = key;
+
+    let next = readCart(key);
+    if (user) {
+      // Items added before logging in move into this account's cart
+      const guest = readCart(GUEST_KEY);
+      if (guest.length) {
+        next = mergeCarts(next, guest);
+        try {
+          localStorage.removeItem(GUEST_KEY);
+        } catch {}
       }
-    } catch (e) {
-      console.warn("Failed to load cart", e);
-    } finally {
-      setHydrated(true);
     }
-  }, []);
+    if (user && next.length) {
+      // Save the merged cart right away so the guest items are never lost
+      try {
+        localStorage.setItem(key, JSON.stringify(next));
+      } catch {}
+    }
+    setItems(next);
+    setActiveKey(key);
+    setIsCartOpen(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authLoading, user?.id]);
 
+  // Save changes to the current account's cart only
   useEffect(() => {
-    if (!hydrated) return;
+    if (!activeKey) return;
     try {
-      localStorage.setItem(CART_KEY, JSON.stringify(items));
+      localStorage.setItem(activeKey, JSON.stringify(items));
     } catch (e) {
       console.warn("Failed to persist cart", e);
     }
-  }, [items, hydrated]);
+  }, [items, activeKey]);
 
   const addToCart = (product: Product, quantity = 1) => {
     setItems((prev) => {

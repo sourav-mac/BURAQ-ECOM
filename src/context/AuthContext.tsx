@@ -12,7 +12,13 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   login: (email: string, pass: string) => Promise<Result>;
-  signup: (name: string, email: string, phone: string, pass: string) => Promise<Result>;
+  /** Step 1: send the email verification code */
+  signup: (name: string, email: string, phone: string, pass: string) => Promise<Result & { resendInSeconds?: number }>;
+  /** Step 2: verify the code → creates the account and logs in */
+  verifySignup: (email: string, otp: string) => Promise<Result>;
+  /** Forgot password: send code, then reset (logs in on success) */
+  requestPasswordReset: (email: string) => Promise<Result & { resendInSeconds?: number }>;
+  resetPassword: (email: string, otp: string, password: string) => Promise<Result>;
   logout: () => void;
   updateProfile: (data: Partial<Omit<User, "id" | "email">>) => Promise<Result>;
   updateAvatar: (file: File | null) => Promise<Result>;
@@ -98,15 +104,43 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const signup = useCallback(async (name: string, email: string, phone: string, pass: string): Promise<Result> => {
-    if (pass.length < 6) return { success: false, message: "Password must be at least 6 characters." };
+  const signup = useCallback(async (name: string, email: string, phone: string, pass: string) => {
     try {
-      const { token, user } = await api.register({ name, email, phone: phone || undefined, password: pass });
+      const r = await api.register({ name, email, phone: phone || undefined, password: pass });
+      return { success: true, resendInSeconds: r.resendInSeconds };
+    } catch (e) {
+      return { success: false, message: errMsg(e, "Sign up failed") };
+    }
+  }, []);
+
+  const requestPasswordReset = useCallback(async (email: string) => {
+    try {
+      const r = await api.forgotPassword(email);
+      return { success: true, resendInSeconds: r.resendInSeconds };
+    } catch (e) {
+      return { success: false, message: errMsg(e, "Couldn't send the code") };
+    }
+  }, []);
+
+  const resetPassword = useCallback(async (email: string, otp: string, password: string): Promise<Result> => {
+    try {
+      const { token, user } = await api.resetPassword(email, otp, password);
       tokenStore.set(token);
       setUser(user);
       return { success: true };
     } catch (e) {
-      return { success: false, message: errMsg(e, "Sign up failed") };
+      return { success: false, message: errMsg(e, "Couldn't reset the password") };
+    }
+  }, []);
+
+  const verifySignup = useCallback(async (email: string, otp: string): Promise<Result> => {
+    try {
+      const { token, user } = await api.verifyRegister(email, otp);
+      tokenStore.set(token);
+      setUser(user);
+      return { success: true };
+    } catch (e) {
+      return { success: false, message: errMsg(e, "Verification failed") };
     }
   }, []);
 
@@ -137,7 +171,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, signup, logout, updateProfile, updateAvatar }}>
+    <AuthContext.Provider value={{ user, isLoading, login, signup, verifySignup, requestPasswordReset, resetPassword, logout, updateProfile, updateAvatar }}>
       {children}
     </AuthContext.Provider>
   );

@@ -121,13 +121,33 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<{ data:
       },
     });
   } catch {
-    throw new ApiError("Cannot reach the BURAQ server. Please try again.", 0);
+    throw new ApiError(MSG_OFFLINE, 0);
   }
   const body = await res.json().catch(() => ({}));
   if (!res.ok || body.success === false) {
-    throw new ApiError(body.message || `Request failed (${res.status})`, res.status);
+    throw new ApiError(friendlyMessage(body.message, res.status), res.status);
   }
   return { data: body.data as T, meta: body.meta };
+}
+
+// ─── Customer-friendly error messages ────────────────────────────────────────
+const MSG_OFFLINE = "Can't connect right now. Please check your internet and try again.";
+const MSG_SERVER = "We're having trouble right now. Please try again in a moment.";
+const MSG_SESSION = "Your session has expired. Please log in again.";
+
+/** Never show raw server / database / stack text; tidy validation messages. */
+function friendlyMessage(raw: unknown, status: number): string {
+  const text = typeof raw === "string" ? raw.trim() : "";
+  const technical =
+    /prisma|invocation|database|ECONN|ETIMEDOUT|ENOTFOUND|stack|undefined|null|TypeError|SyntaxError|Internal server error|Route [A-Z]+ /i;
+  if (status >= 500 || !text || technical.test(text)) return status === 401 ? MSG_SESSION : MSG_SERVER;
+  if (status === 401 && /token|jwt|expired|unauthori/i.test(text)) return MSG_SESSION;
+
+  // Validation lists like "phone: enter a valid…, email: enter a valid…" → first message, sentence-cased
+  const first = text.split(/,\s*(?=[a-zA-Z.]+: )/)[0];
+  const cleaned = first.replace(/^[a-zA-Z.]+:\s*/, "");
+  const sentence = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+  return /[.!?]$/.test(sentence) ? sentence : `${sentence}.`;
 }
 
 export const api = {
@@ -141,8 +161,33 @@ export const api = {
 
   product: (id: string) => request<ProductDetail>(`/products/${encodeURIComponent(id)}`).then((r) => r.data),
 
+  /** Step 1 of Create Account: emails a 6-digit verification code */
   register: (body: { name: string; email: string; phone?: string; password: string }) =>
-    request<{ token: string; user: ShopUser }>("/auth/register", { method: "POST", body: JSON.stringify(body) }).then((r) => r.data),
+    request<{ email: string; expiresInSeconds: number; resendInSeconds: number }>("/auth/register", {
+      method: "POST",
+      body: JSON.stringify(body),
+    }).then((r) => r.data),
+
+  /** Forgot password step 1: email a reset code (same reply whether or not the email exists) */
+  forgotPassword: (email: string) =>
+    request<{ sent: boolean; resendInSeconds: number }>("/auth/forgot-password", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    }).then((r) => r.data),
+
+  /** Forgot password step 2: code + new password → password changed and logged in */
+  resetPassword: (email: string, otp: string, password: string) =>
+    request<{ token: string; user: ShopUser }>("/auth/reset-password", {
+      method: "POST",
+      body: JSON.stringify({ email, otp, password }),
+    }).then((r) => r.data),
+
+  /** Step 2: verify the code → account is created and logged in */
+  verifyRegister: (email: string, otp: string) =>
+    request<{ token: string; user: ShopUser }>("/auth/register/verify", {
+      method: "POST",
+      body: JSON.stringify({ email, otp }),
+    }).then((r) => r.data),
 
   login: (email: string, password: string) =>
     request<{ token: string; user: ShopUser }>("/auth/login", { method: "POST", body: JSON.stringify({ email, password }) }).then((r) => r.data),

@@ -13,8 +13,13 @@ const MOBILE_RE = /^[6-9]\d{9}$/;
 const PIN_RE = /^[1-9]\d{5}$/;
 
 export const clean = {
-  /** Letters, spaces and . ' - only; single spaces */
-  name: (v: string) => v.replace(/[^A-Za-z .'-]/g, "").replace(/\s{2,}/g, " ").slice(0, 60),
+  /** Letters, spaces and . ' - only; auto capitalizes 1st letter of name & surname while keeping the rest small */
+  name: (v: string) => {
+    const allowed = v.replace(/[^A-Za-z .'-]/g, "").replace(/\s{2,}/g, " ").slice(0, 60);
+    return allowed
+      .toLowerCase()
+      .replace(/(^|[\s.'-])([a-z])/g, (_, boundary, char) => boundary + char.toUpperCase());
+  },
   /** 10-digit Indian mobile: digits only, drops a pasted +91 / 0 prefix */
   phone: (v: string) => {
     let d = v.replace(/\D/g, "");

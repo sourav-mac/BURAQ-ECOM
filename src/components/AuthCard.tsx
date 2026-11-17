@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
@@ -16,7 +16,7 @@ const labelCls = "block text-xs font-semibold text-[#445048] mb-1.5 ml-1";
 
 export function AuthCard({ initialMode }: { initialMode: Mode }) {
   const router = useRouter();
-  const { login, signup } = useAuth();
+  const { login, signup, verifySignup, requestPasswordReset, resetPassword } = useAuth();
   const [mode, setMode] = useState<Mode>(initialMode);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -27,12 +27,77 @@ export function AuthCard({ initialMode }: { initialMode: Mode }) {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<"name" | "phone" | "email" | "password", string>>>({});
+  // Email verification (Create Account step 2)
+  const [otpStep, setOtpStep] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [resendIn, setResendIn] = useState(0);
+  const [notice, setNotice] = useState<string | null>(null);
+  const otpRef = useRef<HTMLInputElement>(null);
+
+  // Forgot password: "email" → enter email, "code" → code + new password
+  const [forgot, setForgot] = useState<null | "email" | "code">(null);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const openForgot = () => {
+    setForgot("email");
+    setError(null);
+    setNotice(null);
+    setOtp("");
+    setNewPassword("");
+    setConfirmPassword("");
+  };
+
+  const sendResetCode = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    const emailErr = check.email(email);
+    if (emailErr) return setError(emailErr);
+    if (forgot === "code" && resendIn > 0) return;
+    setIsLoading(true);
+    setError(null);
+    const res = await requestPasswordReset(email.trim());
+    setIsLoading(false);
+    if (!res.success) return setError(res.message || "Couldn't send the code.");
+    setNotice(forgot === "code" ? "A new code has been sent." : null);
+    setOtp("");
+    setForgot("code");
+    setResendIn(res.resendInSeconds ?? 60);
+  };
+
+  const submitReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!/^\d{6}$/.test(otp)) return setError("Enter the 6-digit code from your email.");
+    const pwErr = check.password(newPassword, true);
+    if (pwErr) return setError(pwErr);
+    if (newPassword !== confirmPassword) return setError("Passwords don't match.");
+    setIsLoading(true);
+    setError(null);
+    const res = await resetPassword(email.trim(), otp, newPassword);
+    setIsLoading(false);
+    if (res.success) handleSuccessRedirect();
+    else setError(res.message || "Couldn't reset the password.");
+  };
+
+  useEffect(() => {
+    if (forgot === "code") otpRef.current?.focus();
+  }, [forgot]);
+
+  useEffect(() => {
+    if (resendIn <= 0) return;
+    const t = setTimeout(() => setResendIn((n) => n - 1), 1000);
+    return () => clearTimeout(t);
+  }, [resendIn]);
+
+  useEffect(() => {
+    if (otpStep) otpRef.current?.focus();
+  }, [otpStep]);
 
   const isSignup = mode === "signup";
 
   const switchMode = () => {
     const next: Mode = isSignup ? "login" : "signup";
     setMode(next);
+    setForgot(null);
     setError(null);
     setFieldErrors({});
     window.history.replaceState(null, "", (next === "signup" ? "/signup" : "/signin") + window.location.search);
@@ -58,15 +123,44 @@ export function AuthCard({ initialMode }: { initialMode: Mode }) {
     }
     setIsLoading(true);
     setError(null);
-    const res = isSignup
-      ? await signup(name.trim(), email.trim(), phone.trim(), password)
-      : await login(email.trim(), password);
-    setIsLoading(false);
-    if (res.success) {
-      handleSuccessRedirect();
-    } else {
-      setError(res.message || "Something went wrong.");
+    if (isSignup) {
+      // Step 1: email a verification code
+      const res = await signup(name.trim(), email.trim(), phone.trim(), password);
+      setIsLoading(false);
+      if (!res.success) return setError(res.message || "Something went wrong.");
+      setOtp("");
+      setNotice(null);
+      setOtpStep(true);
+      setResendIn(res.resendInSeconds ?? 60);
+      return;
     }
+    const res = await login(email.trim(), password);
+    setIsLoading(false);
+    if (res.success) handleSuccessRedirect();
+    else setError(res.message || "Something went wrong.");
+  };
+
+  const handleVerify = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!/^\d{6}$/.test(otp)) return setError("Enter the 6-digit code from your email.");
+    setIsLoading(true);
+    setError(null);
+    const res = await verifySignup(email.trim(), otp);
+    setIsLoading(false);
+    if (res.success) handleSuccessRedirect();
+    else setError(res.message || "Verification failed.");
+  };
+
+  const handleResend = async () => {
+    if (resendIn > 0 || isLoading) return;
+    setIsLoading(true);
+    setError(null);
+    const res = await signup(name.trim(), email.trim(), phone.trim(), password);
+    setIsLoading(false);
+    if (!res.success) return setError(res.message || "Couldn't resend the code.");
+    setOtp("");
+    setNotice("A new code has been sent.");
+    setResendIn(res.resendInSeconds ?? 60);
   };
 
   const handleGoogleSignIn = async () => {
@@ -93,6 +187,190 @@ export function AuthCard({ initialMode }: { initialMode: Mode }) {
       <div className="relative z-10 w-full max-w-[800px] md:min-h-[500px] bg-[#fbf9f7] rounded-[28px] shadow-[0_25px_70px_rgba(7,24,18,0.5)] border border-white/60 overflow-hidden flex flex-col md:flex-row">
         {/* Form side */}
         <div className="w-full md:w-[55%] px-6 sm:px-10 py-8 flex flex-col justify-center">
+          {forgot ? (
+            forgot === "email" ? (
+              <form onSubmit={sendResetCode} className="animate-[authFade_0.35s_ease]">
+                <h1 className="text-2xl font-bold text-[#10201F] tracking-tight">Forgot password?</h1>
+                <p className="text-sm text-[#667085] mt-1">Enter your registered email and we&apos;ll send you a code to reset it.</p>
+
+                <label className={`${labelCls} mt-6`}>Email Address</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(clean.email(e.target.value));
+                    setError(null);
+                  }}
+                  placeholder="you@example.com"
+                  autoComplete="email"
+                  maxLength={100}
+                  autoFocus
+                  className={inputCls}
+                />
+                {error && <p className={fieldErrorCls}>{error}</p>}
+
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full h-11 mt-5 rounded-full bg-[#07543F] hover:bg-[#053E2E] active:scale-[0.99] text-white text-sm font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                >
+                  {isLoading && <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+                  Send code
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setForgot(null);
+                    setError(null);
+                  }}
+                  className="mt-5 text-sm text-[#667085] hover:text-[#10201F] cursor-pointer"
+                >
+                  Back to log in
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={submitReset} className="animate-[authFade_0.35s_ease]">
+                <h1 className="text-2xl font-bold text-[#10201F] tracking-tight">Reset password</h1>
+                <p className="text-sm text-[#667085] mt-1">
+                  If <span className="font-semibold text-[#10201F] break-all">{email}</span> is registered, we&apos;ve sent a 6-digit code to it.
+                </p>
+
+                <label className={`${labelCls} mt-5`}>Verification code</label>
+                <input
+                  ref={otpRef}
+                  value={otp}
+                  onChange={(e) => {
+                    setOtp(e.target.value.replace(/\D/g, "").slice(0, 6));
+                    setError(null);
+                  }}
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  maxLength={6}
+                  placeholder="••••••"
+                  className={`${inputCls} h-12 text-center text-xl font-bold tracking-[0.5em]`}
+                />
+
+                <label className={`${labelCls} mt-3.5`}>New password</label>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={newPassword}
+                  onChange={(e) => {
+                    setNewPassword(e.target.value);
+                    setError(null);
+                  }}
+                  placeholder="Min. 6 characters, letters + numbers"
+                  autoComplete="new-password"
+                  maxLength={128}
+                  className={inputCls}
+                />
+                <label className={`${labelCls} mt-3.5`}>Confirm new password</label>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => {
+                    setConfirmPassword(e.target.value);
+                    setError(null);
+                  }}
+                  autoComplete="new-password"
+                  maxLength={128}
+                  className={inputCls}
+                />
+                <label className="mt-2 ml-1 flex items-center gap-2 text-xs text-[#667085] cursor-pointer select-none">
+                  <input type="checkbox" checked={showPassword} onChange={(e) => setShowPassword(e.target.checked)} className="accent-[#07543F]" />
+                  Show passwords
+                </label>
+
+                {error && <p className={fieldErrorCls}>{error}</p>}
+                {!error && notice && <p className="mt-1 text-[11px] font-medium text-[#07543F]">{notice}</p>}
+
+                <button
+                  type="submit"
+                  disabled={isLoading || otp.length !== 6}
+                  className="w-full h-11 mt-5 rounded-full bg-[#07543F] hover:bg-[#053E2E] active:scale-[0.99] text-white text-sm font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                >
+                  {isLoading && <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+                  Reset password &amp; log in
+                </button>
+
+                <div className="mt-5 flex items-center justify-between text-sm">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setForgot("email");
+                      setError(null);
+                    }}
+                    className="text-[#667085] hover:text-[#10201F] cursor-pointer"
+                  >
+                    Change email
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => sendResetCode()}
+                    disabled={resendIn > 0 || isLoading}
+                    className="font-semibold text-[#07543F] hover:underline disabled:text-[#9AA19C] disabled:no-underline cursor-pointer disabled:cursor-default"
+                  >
+                    {resendIn > 0 ? `Resend in ${resendIn}s` : "Resend code"}
+                  </button>
+                </div>
+              </form>
+            )
+          ) : otpStep ? (
+            <form onSubmit={handleVerify} className="animate-[authFade_0.35s_ease]">
+              <h1 className="text-2xl font-bold text-[#10201F] tracking-tight">Verify your email</h1>
+              <p className="text-sm text-[#667085] mt-1">
+                We sent a 6-digit code to <span className="font-semibold text-[#10201F] break-all">{email}</span>
+              </p>
+
+              <label className={`${labelCls} mt-6`}>Verification code</label>
+              <input
+                ref={otpRef}
+                value={otp}
+                onChange={(e) => {
+                  setOtp(e.target.value.replace(/\D/g, "").slice(0, 6));
+                  setError(null);
+                }}
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                maxLength={6}
+                placeholder="••••••"
+                className={`${inputCls} h-12 text-center text-xl font-bold tracking-[0.5em]`}
+              />
+              {error && <p className={fieldErrorCls}>{error}</p>}
+              {!error && notice && <p className="mt-1 text-[11px] font-medium text-[#07543F]">{notice}</p>}
+
+              <button
+                type="submit"
+                disabled={isLoading || otp.length !== 6}
+                className="w-full h-11 mt-5 rounded-full bg-[#07543F] hover:bg-[#053E2E] active:scale-[0.99] text-white text-sm font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+              >
+                {isLoading && <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+                Verify &amp; create account
+              </button>
+
+              <div className="mt-5 flex items-center justify-between text-sm">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOtpStep(false);
+                    setError(null);
+                  }}
+                  className="text-[#667085] hover:text-[#10201F] cursor-pointer"
+                >
+                  Change details
+                </button>
+                <button
+                  type="button"
+                  onClick={handleResend}
+                  disabled={resendIn > 0 || isLoading}
+                  className="font-semibold text-[#07543F] hover:underline disabled:text-[#9AA19C] disabled:no-underline cursor-pointer disabled:cursor-default"
+                >
+                  {resendIn > 0 ? `Resend in ${resendIn}s` : "Resend code"}
+                </button>
+              </div>
+              <p className="mt-4 text-xs text-[#9AA19C]">Didn&apos;t get it? Check your spam folder. The code expires in 10 minutes.</p>
+            </form>
+          ) : (
+            <>
           {/* Title (cross-fades between modes) */}
           <div key={mode} className="animate-[authFade_0.35s_ease]">
             <h1 className="text-2xl font-bold text-[#10201F] tracking-tight">
@@ -200,7 +478,18 @@ export function AuthCard({ initialMode }: { initialMode: Mode }) {
             </div>
 
             <div>
-              <label className={labelCls}>Password</label>
+              <div className="flex items-center justify-between">
+                <label className={labelCls}>Password</label>
+                {!isSignup && (
+                  <button
+                    type="button"
+                    onClick={openForgot}
+                    className="mb-1.5 mr-1 text-xs font-semibold text-[#07543F] hover:text-[#053E2E] cursor-pointer"
+                  >
+                    Forgot password?
+                  </button>
+                )}
+              </div>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -233,7 +522,7 @@ export function AuthCard({ initialMode }: { initialMode: Mode }) {
               {isLoading && (
                 <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               )}
-              {isSignup ? "Create account" : "Log in"}
+              {isSignup ? "Continue" : "Log in"}
             </button>
           </form>
 
@@ -242,11 +531,13 @@ export function AuthCard({ initialMode }: { initialMode: Mode }) {
             <button
               type="button"
               onClick={switchMode}
-              className="font-semibold text-[#07543F] hover:underline cursor-pointer"
+              className="font-semibold text-[#07543F] hover:text-[#053E2E] cursor-pointer"
             >
               {isSignup ? "Log in" : "Create one"}
             </button>
           </p>
+            </>
+          )}
         </div>
 
         {/* Artwork side */}
