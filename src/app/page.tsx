@@ -35,22 +35,59 @@ export default function HomePage() {
   }, [selectedCategory, sortOption, searchTerm]);
 
   return (
-    <div className="flex flex-col w-full py-4 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-4">
-      {/* Compact Controls & Categories Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-[#E2DED5]">
-        {/* Clean Line-Divided Category Links (No Box Design) */}
-        <div className="flex flex-wrap items-center gap-y-1.5 text-xs">
+    <div className="flex flex-col w-full py-3 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-4">
+      {/* Controls Row: Search & Sort */}
+      <div className="flex items-center justify-between gap-3">
+        <div className="relative flex-1 max-w-sm">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search products..."
+            className="w-full pl-3.5 pr-7 py-1.5 rounded-full bg-white border border-[#E2DED5] text-xs font-medium text-[#10201F] placeholder:text-[#667085]/60 focus:outline-none focus:border-[#07543F] focus:ring-1 focus:ring-[#07543F]/20 shadow-2xs"
+          />
+          {searchTerm && (
+            <button
+              onClick={() => setSearchTerm("")}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#E2DED5] text-[#10201F] text-[10px] font-bold flex items-center justify-center cursor-pointer"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+
+        {/* Refined Sort Dropdown */}
+        <div className="relative shrink-0">
+          <select
+            value={sortOption}
+            onChange={(e) => setSortOption(e.target.value as any)}
+            className="appearance-none pl-3.5 pr-7 py-1.5 rounded-full bg-white border border-[#E2DED5] text-xs font-bold text-[#10201F] focus:outline-none focus:border-[#07543F] focus:ring-1 focus:ring-[#07543F]/20 shadow-2xs cursor-pointer"
+          >
+            <option value="featured">Featured</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="rating">Highest Rated</option>
+          </select>
+          <div className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[9px] text-[#667085]">
+            ▼
+          </div>
+        </div>
+      </div>
+
+      {/* Clean Line-Divided Category Links (Single Strict Line, Scrollable if needed) */}
+      <div className="w-full overflow-x-auto no-scrollbar pb-2 border-b border-[#E2DED5]">
+        <div className="flex items-center whitespace-nowrap min-w-max text-xs">
           {CATEGORIES.map((cat, index) => {
             const isSelected = selectedCategory === cat.id;
 
             return (
               <React.Fragment key={cat.id}>
                 {index > 0 && (
-                  <span className="text-[#C5BEB3] px-2 select-none">|</span>
+                  <span className="text-[#C5BEB3] px-2.5 select-none">|</span>
                 )}
                 <button
                   onClick={() => setSelectedCategory(cat.id)}
-                  className={`py-0.5 uppercase tracking-wider font-bold transition-none cursor-pointer ${
+                  className={`py-0.5 uppercase tracking-wider font-bold transition-none cursor-pointer whitespace-nowrap ${
                     isSelected
                       ? "text-[#07543F] underline decoration-2 underline-offset-4 font-black"
                       : "text-[#10201F]/80"
@@ -61,45 +98,6 @@ export default function HomePage() {
               </React.Fragment>
             );
           })}
-        </div>
-
-        {/* Search & Sort Controls */}
-        <div className="flex flex-wrap items-center gap-2 shrink-0">
-          {/* Refined Search Input */}
-          <div className="relative flex-1 sm:flex-initial">
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search products..."
-              className="w-full sm:w-56 pl-3.5 pr-7 py-1.5 rounded-full bg-white border border-[#E2DED5] text-xs font-medium text-[#10201F] placeholder:text-[#667085]/60 focus:outline-none focus:border-[#07543F] focus:ring-1 focus:ring-[#07543F]/20 shadow-2xs"
-            />
-            {searchTerm && (
-              <button
-                onClick={() => setSearchTerm("")}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#E2DED5] text-[#10201F] text-[10px] font-bold flex items-center justify-center cursor-pointer"
-              >
-                ✕
-              </button>
-            )}
-          </div>
-
-          {/* Refined Sort Dropdown */}
-          <div className="relative">
-            <select
-              value={sortOption}
-              onChange={(e) => setSortOption(e.target.value as any)}
-              className="appearance-none pl-3.5 pr-7 py-1.5 rounded-full bg-white border border-[#E2DED5] text-xs font-bold text-[#10201F] focus:outline-none focus:border-[#07543F] focus:ring-1 focus:ring-[#07543F]/20 shadow-2xs cursor-pointer"
-            >
-              <option value="featured">Featured</option>
-              <option value="price-asc">Price: Low to High</option>
-              <option value="price-desc">Price: High to Low</option>
-              <option value="rating">Highest Rated</option>
-            </select>
-            <div className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[9px] text-[#667085]">
-              ▼
-            </div>
-          </div>
         </div>
       </div>
 
