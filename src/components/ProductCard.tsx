@@ -7,13 +7,12 @@ import { Product } from "@/data/products";
 import { useCart } from "@/context/CartContext";
 
 export function ProductCard({ product }: { product: Product }) {
-  const { addToCart, setIsCartOpen } = useCart();
+  const { addToCart } = useCart();
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     addToCart(product, 1);
-    setIsCartOpen(true);
   };
 
   return (
