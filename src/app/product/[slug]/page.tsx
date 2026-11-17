@@ -3,17 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import {
-  Star,
-  ShoppingBag,
-  ShieldCheck,
-  Truck,
-  RotateCcw,
-  CheckCircle2,
-  ChevronRight,
-  Plus,
-  Minus,
-} from "lucide-react";
+import { Plus, Minus } from "lucide-react";
 import { PRODUCTS } from "@/data/products";
 import { useCart } from "@/context/CartContext";
 
@@ -34,11 +24,11 @@ export default function ProductDetailPage() {
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-xs text-[#667085]">
         <Link href="/" className="text-[#667085]">Home</Link>
-        <ChevronRight className="w-3.5 h-3.5" />
+        <span>/</span>
         <Link href="/products" className="text-[#667085]">Products</Link>
-        <ChevronRight className="w-3.5 h-3.5" />
-        <Link href={`/category/${product.category}`} className="capitalize text-[#667085]">{product.category}</Link>
-        <ChevronRight className="w-3.5 h-3.5" />
+        <span>/</span>
+        <Link href={`/category/${product.category}`} className="uppercase text-[#667085]">{product.category}</Link>
+        <span>/</span>
         <span className="text-[#10201F] truncate max-w-[200px]">{product.name}</span>
       </nav>
 
@@ -68,10 +58,9 @@ export default function ProductDetailPage() {
                 {product.brand}
               </span>
               <span className="text-[#E2DED5]">•</span>
-              <div className="flex items-center gap-1 text-[#07543F] text-xs font-bold">
-                <Star className="w-4 h-4 fill-[#07543F]" />
-                <span className="text-[#10201F]">{product.rating}</span>
-                <span className="text-[#667085]">({product.reviewsCount} customer reviews)</span>
+              <div className="text-xs font-bold text-[#D96B1F]">
+                ★ {product.rating}{" "}
+                <span className="text-[#667085] font-normal">({product.reviewsCount} reviews)</span>
               </div>
             </div>
 
@@ -80,7 +69,7 @@ export default function ProductDetailPage() {
             </h1>
 
             <p className="text-xs text-[#667085]">
-              Category: <span className="text-[#10201F] capitalize">{product.categoryName}</span>
+              Category: <span className="text-[#10201F] uppercase font-bold">{product.categoryName}</span>
             </p>
           </div>
 
@@ -129,29 +118,25 @@ export default function ProductDetailPage() {
 
               <button
                 onClick={() => addToCart(product, quantity)}
-                className="flex-1 py-3.5 px-6 rounded-xl bg-[#07543F] text-[#FFFDEB] text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-xs cursor-pointer"
+                className="flex-1 py-3.5 px-6 rounded-xl bg-[#07543F] text-[#FFFDEB] text-xs font-black uppercase tracking-wider flex items-center justify-center shadow-xs cursor-pointer"
               >
-                <ShoppingBag className="w-4 h-4" />
-                <span>Add To Cart • ₹{(product.price * quantity).toLocaleString("en-IN")}</span>
+                Add To Cart • ₹{(product.price * quantity).toLocaleString("en-IN")}
               </button>
             </div>
 
-            {/* Guarantees */}
+            {/* Guarantees - Text based */}
             <div className="grid grid-cols-3 gap-2 pt-2">
-              <div className="p-3 rounded-xl bg-white border border-[#E2DED5] flex flex-col items-center text-center">
-                <Truck className="w-4 h-4 text-[#07543F] mb-1" />
-                <span className="text-[10px] font-bold text-[#10201F]">Free Delivery</span>
-                <span className="text-[9px] text-[#667085]">Orders over ₹1500</span>
+              <div className="p-3 rounded-xl bg-white border border-[#E2DED5] text-center">
+                <div className="text-[11px] font-bold text-[#10201F]">Free Delivery</div>
+                <div className="text-[9px] text-[#667085]">Orders over ₹1500</div>
               </div>
-              <div className="p-3 rounded-xl bg-white border border-[#E2DED5] flex flex-col items-center text-center">
-                <ShieldCheck className="w-4 h-4 text-[#07543F] mb-1" />
-                <span className="text-[10px] font-bold text-[#10201F]">Genuine BURAQ</span>
-                <span className="text-[9px] text-[#667085]">Full warranty card</span>
+              <div className="p-3 rounded-xl bg-white border border-[#E2DED5] text-center">
+                <div className="text-[11px] font-bold text-[#10201F]">Genuine BURAQ</div>
+                <div className="text-[9px] text-[#667085]">Full warranty card</div>
               </div>
-              <div className="p-3 rounded-xl bg-white border border-[#E2DED5] flex flex-col items-center text-center">
-                <RotateCcw className="w-4 h-4 text-[#07543F] mb-1" />
-                <span className="text-[10px] font-bold text-[#10201F]">7 Days Return</span>
-                <span className="text-[9px] text-[#667085]">Transit safety insured</span>
+              <div className="p-3 rounded-xl bg-white border border-[#E2DED5] text-center">
+                <div className="text-[11px] font-bold text-[#10201F]">7 Days Return</div>
+                <div className="text-[9px] text-[#667085]">Transit safety insured</div>
               </div>
             </div>
           </div>
@@ -195,8 +180,8 @@ export default function ProductDetailPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {product.features.map((f, i) => (
-              <div key={i} className="flex items-start gap-2.5 text-xs text-[#10201F]">
-                <CheckCircle2 className="w-4 h-4 text-[#07543F] shrink-0 mt-0.5" />
+              <div key={i} className="flex items-start gap-2 text-xs text-[#10201F]">
+                <span className="text-[#07543F] font-bold">•</span>
                 <span>{f}</span>
               </div>
             ))}

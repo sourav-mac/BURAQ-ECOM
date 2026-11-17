@@ -2,8 +2,8 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Zap, AlertCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 export default function SignInPage() {
@@ -31,14 +31,17 @@ export default function SignInPage() {
 
   return (
     <div className="py-20 px-4 flex items-center justify-center">
-      <div className="w-full max-w-md p-8 sm:p-10 rounded-2xl bg-[#FFFFFF] border border-[#E2DED5] space-y-6 shadow-xl relative">
+      <div className="w-full max-w-md p-8 sm:p-10 rounded-2xl bg-white border border-[#E2DED5] space-y-6 shadow-xl relative">
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 mx-auto rounded-xl bg-[#07543F] flex items-center justify-center text-[#FFFDEB] shadow-md">
-            <Zap className="w-6 h-6 fill-[#FFFDEB]" />
-          </div>
-          <span className="text-xs font-bold uppercase tracking-widest text-[#07543F]">
-            BURAQ STORE
-          </span>
+          <Link href="/" className="inline-block mb-1">
+            <Image
+              src="/images/buraq-logo.png"
+              alt="BURAQ ENTERPRISE"
+              width={200}
+              height={60}
+              className="h-10 w-auto mx-auto object-contain"
+            />
+          </Link>
           <h1 className="text-2xl font-black text-[#10201F]">Sign In to Your Account</h1>
           <p className="text-xs text-[#667085]">
             Access order history, track deliveries, and manage saved shipping addresses.
@@ -46,9 +49,8 @@ export default function SignInPage() {
         </div>
 
         {error && (
-          <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            <span>{error}</span>
+          <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-xs">
+            {error}
           </div>
         )}
 
@@ -61,7 +63,7 @@ export default function SignInPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="name@example.com"
-              className="w-full px-4 py-3 rounded-xl bg-[#FFFDEB] border border-[#E2DED5] text-xs text-[#10201F] placeholder:text-[#667085]/50 focus:outline-none focus:border-[#07543F]"
+              className="w-full px-4 py-3 rounded-xl bg-[#FAF8E4] border border-[#E2DED5] text-xs text-[#10201F] placeholder:text-[#667085]/50 focus:outline-none focus:border-[#07543F]"
             />
           </div>
 
@@ -85,10 +87,9 @@ export default function SignInPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 rounded-xl bg-[#07543F] text-[#FFFDEB] text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-xs cursor-pointer disabled:opacity-50"
+            className="w-full py-3.5 rounded-xl bg-[#07543F] text-[#FFFDEB] text-xs font-black uppercase tracking-wider flex items-center justify-center shadow-xs cursor-pointer disabled:opacity-50"
           >
             {loading ? "Signing in..." : "Sign In"}
-            <ArrowRight className="w-4 h-4" />
           </button>
         </form>
 

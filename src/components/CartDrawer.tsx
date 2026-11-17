@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { X, Plus, Minus, Trash2, ArrowRight, ShieldCheck, ShoppingBag } from "lucide-react";
+import { X, Plus, Minus, Trash2 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 
 export function CartDrawer() {
@@ -33,7 +33,6 @@ export function CartDrawer() {
           {/* Header */}
           <div className="p-5 border-b border-[#E2DED5] flex items-center justify-between bg-white">
             <div className="flex items-center gap-2">
-              <ShoppingBag className="w-5 h-5 text-[#07543F]" />
               <h2 className="text-sm font-black uppercase tracking-wider text-[#10201F]">Your Cart</h2>
               <span className="px-2 py-0.5 rounded-full bg-[#FAF8E4] border border-[#E2DED5] text-[10px] font-bold text-[#10201F]">
                 {items.length} {items.length === 1 ? "item" : "items"}
@@ -51,12 +50,9 @@ export function CartDrawer() {
           <div className="flex-1 overflow-y-auto p-5 space-y-4 custom-scrollbar">
             {items.length === 0 ? (
               <div className="py-20 text-center space-y-3">
-                <div className="w-14 h-14 mx-auto rounded-2xl bg-white border border-[#E2DED5] flex items-center justify-center text-[#667085]">
-                  <ShoppingBag className="w-6 h-6" />
-                </div>
                 <h3 className="text-sm font-bold text-[#10201F]">Your cart is empty</h3>
                 <p className="text-xs text-[#667085] max-w-xs mx-auto">
-                  Browse our high-grade lighting, electrical switchgear, and solar packages.
+                  Browse our high-grade lighting, electrical switchgear, and wiring products.
                 </p>
                 <button
                   onClick={() => setIsCartOpen(false)}
@@ -158,16 +154,14 @@ export function CartDrawer() {
                 <Link
                   href="/checkout"
                   onClick={() => setIsCartOpen(false)}
-                  className="w-full py-3 rounded-xl bg-[#07543F] text-[#FFFDEB] text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm"
+                  className="w-full py-3 rounded-xl bg-[#07543F] text-[#FFFDEB] text-xs font-black uppercase tracking-wider flex items-center justify-center shadow-sm"
                 >
-                  <span>Proceed to Checkout</span>
-                  <ArrowRight className="w-4 h-4" />
+                  Proceed to Checkout
                 </Link>
               </div>
 
-              <div className="flex items-center justify-center gap-2 text-[10px] text-[#667085] pt-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#07543F]" />
-                <span>100% Secure Checkout • Direct Buraq Dispatch</span>
+              <div className="text-center text-[10px] text-[#667085] pt-1">
+                100% Secure Checkout • Direct Buraq Dispatch
               </div>
             </div>
           )}

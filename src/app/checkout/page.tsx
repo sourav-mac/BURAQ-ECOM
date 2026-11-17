@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, CheckCircle2, ShieldCheck, Lock, CreditCard, Banknote, Truck } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 
@@ -43,9 +42,6 @@ export default function CheckoutPage() {
   if (orderSuccess) {
     return (
       <div className="py-20 px-4 max-w-xl mx-auto text-center space-y-6">
-        <div className="w-20 h-20 rounded-full bg-[#07543F]/20 text-[#07543F] mx-auto flex items-center justify-center animate-bounce">
-          <CheckCircle2 className="w-10 h-10" />
-        </div>
         <div className="space-y-2">
           <span className="text-xs font-bold text-[#07543F] uppercase tracking-widest">Order Confirmed</span>
           <h1 className="text-3xl font-black text-[#10201F]">Thank You For Your Order!</h1>
@@ -96,18 +92,16 @@ export default function CheckoutPage() {
 
   return (
     <div className="py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full space-y-8">
-      <Link href="/products" className="inline-flex items-center gap-1.5 text-xs text-[#667085]">
-        <ArrowLeft className="w-4 h-4" />
-        <span>Continue Shopping</span>
+      <Link href="/products" className="text-xs text-[#667085] font-bold">
+        ← Continue Shopping
       </Link>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left: Shipping Form */}
         <form onSubmit={handleSubmit} className="lg:col-span-7 space-y-6">
           <div className="p-6 sm:p-8 rounded-2xl bg-[#FFFFFF] border border-[#E2DED5] space-y-6">
-            <h2 className="text-xl font-black uppercase text-[#10201F] tracking-tight flex items-center gap-2">
-              <Truck className="w-5 h-5 text-[#07543F]" />
-              <span>1. Delivery & Contact Details</span>
+            <h2 className="text-xl font-black uppercase text-[#10201F] tracking-tight">
+              1. Delivery & Contact Details
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -118,8 +112,8 @@ export default function CheckoutPage() {
                   required
                   value={formData.fullName}
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                  placeholder="e.g. Ramesh Chandra Roy"
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#FFFDEB] border border-[#E2DED5] text-xs text-[#10201F] placeholder:text-[#667085]/50 focus:outline-none focus:border-[#07543F]"
+                  placeholder="e.g. Rajesh Kumar"
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8E4] border border-[#E2DED5] text-xs text-[#10201F] focus:outline-none focus:border-[#07543F]"
                 />
               </div>
 
@@ -130,8 +124,8 @@ export default function CheckoutPage() {
                   required
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  placeholder="e.g. 9830012345"
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#FFFDEB] border border-[#E2DED5] text-xs text-[#10201F] placeholder:text-[#667085]/50 focus:outline-none focus:border-[#07543F]"
+                  placeholder="+91 98300 00000"
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8E4] border border-[#E2DED5] text-xs text-[#10201F] focus:outline-none focus:border-[#07543F]"
                 />
               </div>
 
@@ -142,32 +136,32 @@ export default function CheckoutPage() {
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="e.g. ramesh@example.com"
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#FFFDEB] border border-[#E2DED5] text-xs text-[#10201F] placeholder:text-[#667085]/50 focus:outline-none focus:border-[#07543F]"
+                  placeholder="rajesh@example.com"
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8E4] border border-[#E2DED5] text-xs text-[#10201F] focus:outline-none focus:border-[#07543F]"
                 />
               </div>
 
               <div className="sm:col-span-2 space-y-1.5">
-                <label className="text-xs font-bold text-[#10201F]">Street Address & Landmark *</label>
-                <input
-                  type="text"
+                <label className="text-xs font-bold text-[#10201F]">Delivery Address *</label>
+                <textarea
                   required
+                  rows={3}
                   value={formData.address}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  placeholder="Flat / Premise No, Street name, Near Landmark"
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#FFFDEB] border border-[#E2DED5] text-xs text-[#10201F] placeholder:text-[#667085]/50 focus:outline-none focus:border-[#07543F]"
+                  placeholder="Flat / House No, Street name, Landmark..."
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8E4] border border-[#E2DED5] text-xs text-[#10201F] focus:outline-none focus:border-[#07543F]"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-[#10201F]">City / District *</label>
+                <label className="text-xs font-bold text-[#10201F]">City *</label>
                 <input
                   type="text"
                   required
                   value={formData.city}
                   onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                  placeholder="e.g. Kolkata"
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#FFFDEB] border border-[#E2DED5] text-xs text-[#10201F] placeholder:text-[#667085]/50 focus:outline-none focus:border-[#07543F]"
+                  placeholder="Kolkata"
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8E4] border border-[#E2DED5] text-xs text-[#10201F] focus:outline-none focus:border-[#07543F]"
                 />
               </div>
 
@@ -176,10 +170,11 @@ export default function CheckoutPage() {
                 <input
                   type="text"
                   required
+                  maxLength={6}
                   value={formData.pincode}
                   onChange={(e) => setFormData({ ...formData, pincode: e.target.value })}
-                  placeholder="e.g. 700001"
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#FFFDEB] border border-[#E2DED5] text-xs text-[#10201F] placeholder:text-[#667085]/50 focus:outline-none focus:border-[#07543F]"
+                  placeholder="700001"
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8E4] border border-[#E2DED5] text-xs text-[#10201F] focus:outline-none focus:border-[#07543F]"
                 />
               </div>
             </div>
@@ -187,9 +182,8 @@ export default function CheckoutPage() {
 
           {/* Payment Method */}
           <div className="p-6 sm:p-8 rounded-2xl bg-[#FFFFFF] border border-[#E2DED5] space-y-4">
-            <h2 className="text-xl font-black uppercase text-[#10201F] tracking-tight flex items-center gap-2">
-              <CreditCard className="w-5 h-5 text-[#07543F]" />
-              <span>2. Select Payment Method</span>
+            <h2 className="text-xl font-black uppercase text-[#10201F] tracking-tight">
+              2. Select Payment Method
             </h2>
 
             <div className="space-y-3">
@@ -212,7 +206,7 @@ export default function CheckoutPage() {
                     <div className="text-[11px] text-[#667085]">Instant order confirmation with 256-bit SSL encryption</div>
                   </div>
                 </div>
-                <Lock className="w-4 h-4 text-[#07543F]" />
+                <span className="text-xs font-bold text-[#07543F]">Instant</span>
               </label>
 
               <label
@@ -234,7 +228,7 @@ export default function CheckoutPage() {
                     <div className="text-[11px] text-[#667085]">Pay when courier arrives at your location</div>
                   </div>
                 </div>
-                <Banknote className="w-4 h-4 text-[#07543F]" />
+                <span className="text-xs font-bold text-[#667085]">COD</span>
               </label>
             </div>
           </div>
@@ -242,7 +236,7 @@ export default function CheckoutPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-4 rounded-xl bg-[#07543F] text-[#FFFDEB] font-black uppercase tracking-wider text-sm flex items-center justify-center gap-2 shadow-xs cursor-pointer disabled:opacity-50"
+            className="w-full py-4 rounded-xl bg-[#07543F] text-[#FFFDEB] font-black uppercase tracking-wider text-sm flex items-center justify-center shadow-xs cursor-pointer disabled:opacity-50"
           >
             {isSubmitting ? (
               <span>Processing Order...</span>
@@ -258,17 +252,15 @@ export default function CheckoutPage() {
             Order Summary ({items.length} {items.length === 1 ? "item" : "items"})
           </h3>
 
-          <div className="space-y-4 max-h-80 overflow-y-auto pr-1 custom-scrollbar">
+          <div className="space-y-3 max-h-60 overflow-y-auto custom-scrollbar">
             {items.map(({ product, quantity }) => (
               <div key={product.id} className="flex gap-3 text-xs">
-                <img src={product.image} alt={product.name} className="w-14 h-14 rounded-lg object-cover shrink-0" />
+                <img src={product.image} alt={product.name} className="w-12 h-12 object-cover rounded-lg bg-[#FAF8E4] border border-[#E2DED5] shrink-0" />
                 <div className="flex-1 min-w-0">
                   <h4 className="font-bold text-[#10201F] truncate">{product.name}</h4>
-                  <div className="text-[#667085] text-[11px]">Qty: {quantity} × ₹{product.price.toLocaleString("en-IN")}</div>
+                  <div className="text-[#667085]">Qty: {quantity} × ₹{product.price.toLocaleString("en-IN")}</div>
                 </div>
-                <div className="font-bold text-[#07543F]">
-                  ₹{(product.price * quantity).toLocaleString("en-IN")}
-                </div>
+                <div className="font-bold text-[#07543F]">₹{(product.price * quantity).toLocaleString("en-IN")}</div>
               </div>
             ))}
           </div>
@@ -292,9 +284,8 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-[#FFFDEB] border border-[#E2DED5] text-[11px] text-[#667085] flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-[#07543F] shrink-0" />
-            <span>Official BURAQ Enterprise warranty card and GST tax invoice dispatched with shipment.</span>
+          <div className="p-3.5 rounded-xl bg-[#FFFDEB] border border-[#E2DED5] text-[11px] text-[#667085]">
+            Official BURAQ Enterprise warranty card and GST tax invoice dispatched with shipment.
           </div>
         </div>
       </div>

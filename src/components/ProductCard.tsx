@@ -1,6 +1,5 @@
 import React from "react";
 import Link from "next/link";
-import { Star, ArrowRight } from "lucide-react";
 import { Product } from "@/data/products";
 
 export function ProductCard({ product }: { product: Product }) {
@@ -39,10 +38,9 @@ export function ProductCard({ product }: { product: Product }) {
         <div className="space-y-1.5">
           <div className="flex items-center justify-between text-[11px] text-[#07543F] font-bold uppercase tracking-wider">
             <span>{product.brand}</span>
-            <div className="flex items-center gap-1 text-[#D96B1F]">
-              <Star className="w-3.5 h-3.5 fill-[#D96B1F]" />
-              <span className="text-[#10201F]">{product.rating}</span>
-              <span className="text-[#667085]">({product.reviewsCount})</span>
+            <div className="text-[#D96B1F] font-bold">
+              ★ {product.rating}{" "}
+              <span className="text-[#667085] font-normal">({product.reviewsCount})</span>
             </div>
           </div>
 
@@ -72,10 +70,9 @@ export function ProductCard({ product }: { product: Product }) {
 
           <Link
             href={`/product/${product.slug}`}
-            className="px-3.5 py-2 rounded-xl bg-[#07543F] text-[#FFFDEB] text-xs font-bold flex items-center gap-1.5 shadow-xs"
+            className="px-4 py-2 rounded-xl bg-[#07543F] text-[#FFFDEB] text-xs font-bold shadow-xs text-center"
           >
-            <span>View</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            View
           </Link>
         </div>
       </div>

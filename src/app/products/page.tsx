@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Search, SlidersHorizontal, ArrowUpDown, RotateCcw } from "lucide-react";
 import { PRODUCTS, CATEGORIES, ProductCategory } from "@/data/products";
 import { ProductCard } from "@/components/ProductCard";
 
@@ -48,21 +47,17 @@ export default function ProductsCatalogPage() {
         {/* Top Controls: Search + Sort Dropdown */}
         <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
           <div className="relative flex-1">
-            <Search className="w-4 h-4 text-[#667085] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search lights, wire, fans, MCBs, switches, wall lamps..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FAF8E4] border border-[#E2DED5] text-xs text-[#10201F] placeholder:text-[#667085]/60 focus:outline-none focus:border-[#07543F]"
+              className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8E4] border border-[#E2DED5] text-xs text-[#10201F] placeholder:text-[#667085]/60 focus:outline-none focus:border-[#07543F]"
             />
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
-            <div className="flex items-center gap-1.5 px-3 py-2 bg-[#FAF8E4] border border-[#E2DED5] rounded-xl text-xs font-bold text-[#10201F]">
-              <ArrowUpDown className="w-3.5 h-3.5 text-[#07543F]" />
-              <span>Sort:</span>
-            </div>
+            <span className="text-xs font-bold text-[#10201F]">Sort By:</span>
             <select
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value as any)}
@@ -79,10 +74,9 @@ export default function ProductsCatalogPage() {
         {/* Categories Strip */}
         <div className="pt-2 border-t border-[#E2DED5]/80 space-y-2">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-[#07543F]">
-              <SlidersHorizontal className="w-3.5 h-3.5" />
-              <span>Categories:</span>
-            </div>
+            <span className="text-xs font-black uppercase tracking-wider text-[#07543F]">
+              Categories:
+            </span>
             {(selectedCategory !== "all" || searchTerm || sortOption !== "featured") && (
               <button
                 onClick={() => {
@@ -90,10 +84,9 @@ export default function ProductsCatalogPage() {
                   setSearchTerm("");
                   setSortOption("featured");
                 }}
-                className="flex items-center gap-1 text-[11px] font-bold text-[#D96B1F] cursor-pointer"
+                className="text-[11px] font-bold text-[#D96B1F] cursor-pointer"
               >
-                <RotateCcw className="w-3 h-3" />
-                <span>Reset</span>
+                Reset
               </button>
             )}
           </div>

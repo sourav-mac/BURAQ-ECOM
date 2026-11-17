@@ -3,7 +3,6 @@
 import React, { useState, useMemo } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowUpDown, ArrowLeft } from "lucide-react";
 import { PRODUCTS, ProductCategory, CATEGORIES } from "@/data/products";
 import { ProductCard } from "@/components/ProductCard";
 
@@ -76,9 +75,8 @@ export default function CategoryPage() {
     <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full space-y-8">
       {/* Back button */}
       <div>
-        <Link href="/" className="inline-flex items-center gap-1.5 text-xs text-[#667085]">
-          <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Back to All Categories</span>
+        <Link href="/" className="text-xs text-[#667085] font-bold">
+          ← Back to All Categories
         </Link>
       </div>
 
@@ -99,10 +97,7 @@ export default function CategoryPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#FAF8E4] border border-[#E2DED5] rounded-lg text-xs font-bold text-[#10201F]">
-            <ArrowUpDown className="w-3 h-3 text-[#07543F]" />
-            <span>Sort Price:</span>
-          </div>
+          <span className="text-xs font-bold text-[#10201F]">Sort By:</span>
           <select
             value={sortOption}
             onChange={(e) => setSortOption(e.target.value as any)}

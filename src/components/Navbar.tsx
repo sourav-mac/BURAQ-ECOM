@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ShoppingBag, User, Menu, X } from "lucide-react";
+import { ShoppingBag, Menu, X } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 
@@ -73,9 +73,8 @@ export function Navbar() {
           ) : (
             <Link
               href="/signin"
-              className="hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-[#E2DED5] text-[#10201F] text-xs font-bold cursor-pointer"
+              className="hidden sm:flex items-center px-3.5 py-2 rounded-xl bg-white border border-[#E2DED5] text-[#10201F] text-xs font-bold cursor-pointer"
             >
-              <User className="w-3.5 h-3.5" />
               <span>Sign In</span>
             </Link>
           )}
