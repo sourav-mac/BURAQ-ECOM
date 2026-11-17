@@ -2,26 +2,14 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { ShoppingBag, User, Zap, Menu, X } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 
 export function Navbar() {
-  const pathname = usePathname();
   const { totalItems, setIsCartOpen } = useCart();
   const { user, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const mainLinks = [
-    { label: "Home", href: "/" },
-    { label: "Lighting", href: "/category/lighting" },
-    { label: "Wire", href: "/category/wire" },
-    { label: "Fan", href: "/category/fan" },
-    { label: "MCB", href: "/category/mcb" },
-    { label: "Switch", href: "/category/switch" },
-    { label: "All Products", href: "/products" },
-  ];
 
   const allCategories = [
     { label: "LIGHTING", href: "/category/lighting" },
@@ -53,26 +41,6 @@ export function Navbar() {
             </p>
           </div>
         </Link>
-
-        {/* Center Pill Nav Menu */}
-        <nav className="hidden lg:flex items-center gap-1 p-1.5 rounded-full bg-white border border-[#E2DED5]">
-          {mainLinks.map((link) => {
-            const isActive = pathname === link.href;
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wide ${
-                  isActive
-                    ? "bg-[#07543F] text-[#FFFDEB] font-bold shadow-xs"
-                    : "text-[#10201F]"
-                }`}
-              >
-                {link.label}
-              </Link>
-            );
-          })}
-        </nav>
 
         {/* Right Action Icons: Cart, Auth & Shop */}
         <div className="flex items-center gap-3">
@@ -111,18 +79,18 @@ export function Navbar() {
             </Link>
           )}
 
-          {/* Primary Shop Button */}
+          {/* Primary Shop / Catalog Button */}
           <Link
             href="/products"
             className="hidden sm:inline-flex items-center justify-center px-4 py-2 rounded-xl bg-[#07543F] text-[#FFFDEB] text-xs font-black uppercase tracking-wider shadow-xs"
           >
-            Shop Now
+            All Products
           </Link>
 
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-xl bg-white border border-[#E2DED5] text-[#10201F] cursor-pointer"
+            className="sm:hidden p-2 rounded-xl bg-white border border-[#E2DED5] text-[#10201F] cursor-pointer"
             aria-label="Toggle Navigation"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -132,9 +100,9 @@ export function Navbar() {
 
       {/* Mobile Nav Drawer */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-white border-b border-[#E2DED5] px-4 py-4 space-y-3">
+        <div className="sm:hidden bg-white border-b border-[#E2DED5] px-4 py-4 space-y-3">
           <div className="text-[11px] font-black uppercase text-[#07543F] tracking-wider">
-            All Categories
+            Shop by Category
           </div>
           <div className="grid grid-cols-2 gap-1.5">
             {allCategories.map((cat) => (
