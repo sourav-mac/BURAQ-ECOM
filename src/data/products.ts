@@ -16,6 +16,56 @@ export interface CategoryMeta {
   description: string;
 }
 
+// 4 Clean Department Categories for Top Navigation
+export const NAV_DEPARTMENTS: {
+  id: string;
+  label: string;
+  slug: string;
+  subCategories: ProductCategory[];
+}[] = [
+  {
+    id: "all",
+    label: "ALL",
+    slug: "",
+    subCategories: [
+      "lighting",
+      "wire",
+      "fan",
+      "mcb",
+      "switch",
+      "accessories",
+      "wall-lamp",
+      "hanging-lamp",
+      "ceiling-light",
+      "others",
+    ],
+  },
+  {
+    id: "lights",
+    label: "LIGHTS",
+    slug: "lighting",
+    subCategories: ["lighting", "wall-lamp", "hanging-lamp", "ceiling-light"],
+  },
+  {
+    id: "fans",
+    label: "FANS",
+    slug: "fan",
+    subCategories: ["fan"],
+  },
+  {
+    id: "wires",
+    label: "WIRES",
+    slug: "wire",
+    subCategories: ["wire"],
+  },
+  {
+    id: "electric",
+    label: "ELECTRIC",
+    slug: "switch",
+    subCategories: ["switch", "mcb", "accessories", "others"],
+  },
+];
+
 export const CATEGORIES: { id: "all" | ProductCategory; label: string }[] = [
   { id: "all", label: "ALL" },
   { id: "lighting", label: "LIGHTING" },

@@ -1,18 +1,32 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { PRODUCTS, CATEGORIES, ProductCategory } from "@/data/products";
+import { PRODUCTS, NAV_DEPARTMENTS, ProductCategory } from "@/data/products";
 import { ProductCard } from "@/components/ProductCard";
 
 export default function HomePage() {
-  const [selectedCategory, setSelectedCategory] = useState<"all" | ProductCategory>("all");
+  const [selectedDept, setSelectedDept] = useState<string>("all");
+  const [selectedSubCat, setSelectedSubCat] = useState<"all" | ProductCategory>("all");
   const [sortOption, setSortOption] = useState<"featured" | "price-asc" | "price-desc" | "rating">("featured");
   const [searchTerm, setSearchTerm] = useState("");
 
+  const activeDepartment = useMemo(() => {
+    return NAV_DEPARTMENTS.find((d) => d.id === selectedDept) || NAV_DEPARTMENTS[0];
+  }, [selectedDept]);
+
   const filteredAndSortedProducts = useMemo(() => {
     let result = PRODUCTS.filter((product) => {
-      const matchCategory =
-        selectedCategory === "all" ? true : product.category === selectedCategory;
+      // 1. Check department match
+      const matchDept =
+        selectedDept === "all"
+          ? true
+          : activeDepartment.subCategories.includes(product.category);
+
+      // 2. Check subcategory match (if user picked a specific subcategory within that department)
+      const matchSub =
+        selectedSubCat === "all" ? true : product.category === selectedSubCat;
+
+      // 3. Check search match
       const matchSearch =
         searchTerm.trim() === ""
           ? true
@@ -20,7 +34,8 @@ export default function HomePage() {
             product.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
             product.categoryName.toLowerCase().includes(searchTerm.toLowerCase()) ||
             product.shortDesc.toLowerCase().includes(searchTerm.toLowerCase());
-      return matchCategory && matchSearch;
+
+      return matchDept && matchSub && matchSearch;
     });
 
     if (sortOption === "price-asc") {
@@ -32,10 +47,33 @@ export default function HomePage() {
     }
 
     return result;
-  }, [selectedCategory, sortOption, searchTerm]);
+  }, [selectedDept, activeDepartment, selectedSubCat, sortOption, searchTerm]);
+
+  // Subcategories mapping for lights and electric
+  const subCategoryChips = useMemo(() => {
+    if (selectedDept === "lights") {
+      return [
+        { id: "all", label: "ALL LIGHTS" },
+        { id: "lighting", label: "COMMERCIAL LED" },
+        { id: "wall-lamp", label: "WALL LAMP" },
+        { id: "hanging-lamp", label: "HANGING LAMP" },
+        { id: "ceiling-light", label: "CEILING LIGHT" },
+      ];
+    }
+    if (selectedDept === "electric") {
+      return [
+        { id: "all", label: "ALL ELECTRIC" },
+        { id: "switch", label: "SWITCH" },
+        { id: "mcb", label: "MCB" },
+        { id: "accessories", label: "ACCESSORIES" },
+        { id: "others", label: "OTHERS" },
+      ];
+    }
+    return [];
+  }, [selectedDept]);
 
   return (
-    <div className="flex flex-col w-full py-3 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-4">
+    <div className="flex flex-col w-full py-3 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-3">
       {/* Controls Row: Search & Sort */}
       <div className="flex items-center justify-between gap-3">
         <div className="relative flex-1 max-w-sm">
@@ -74,32 +112,59 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Clean Line-Divided Category Links (Single Strict Line, Scrollable if needed) */}
-      <div className="w-full overflow-x-auto no-scrollbar pb-2 border-b border-[#E2DED5]">
+      {/* Clean Primary Departments: ALL | LIGHTS | WIRES | FANS | ELECTRIC */}
+      <div className="w-full overflow-x-auto no-scrollbar pb-1 border-b border-[#E2DED5]">
         <div className="flex items-center whitespace-nowrap min-w-max text-xs">
-          {CATEGORIES.map((cat, index) => {
-            const isSelected = selectedCategory === cat.id;
+          {NAV_DEPARTMENTS.map((dept, index) => {
+            const isSelected = selectedDept === dept.id;
 
             return (
-              <React.Fragment key={cat.id}>
+              <React.Fragment key={dept.id}>
                 {index > 0 && (
-                  <span className="text-[#C5BEB3] px-2.5 select-none">|</span>
+                  <span className="text-[#C5BEB3] px-3 select-none">|</span>
                 )}
                 <button
-                  onClick={() => setSelectedCategory(cat.id)}
+                  onClick={() => {
+                    setSelectedDept(dept.id);
+                    setSelectedSubCat("all");
+                  }}
                   className={`py-0.5 uppercase tracking-wider font-bold transition-none cursor-pointer whitespace-nowrap ${
                     isSelected
                       ? "text-[#07543F] underline decoration-2 underline-offset-4 font-black"
-                      : "text-[#10201F]/80"
+                      : "text-[#10201F]/70"
                   }`}
                 >
-                  {cat.label}
+                  {dept.label}
                 </button>
               </React.Fragment>
             );
           })}
         </div>
       </div>
+
+      {/* Secondary Sub-filters for Lights / Electric (Only when dept has subcategories) */}
+      {subCategoryChips.length > 0 && (
+        <div className="w-full overflow-x-auto no-scrollbar py-1">
+          <div className="flex items-center gap-1.5 whitespace-nowrap min-w-max text-[11px]">
+            {subCategoryChips.map((sub) => {
+              const isSelected = selectedSubCat === sub.id;
+              return (
+                <button
+                  key={sub.id}
+                  onClick={() => setSelectedSubCat(sub.id as any)}
+                  className={`px-3 py-1 rounded-full font-bold uppercase transition-none cursor-pointer border ${
+                    isSelected
+                      ? "bg-[#07543F] text-white border-[#07543F]"
+                      : "bg-white text-[#10201F]/80 border-[#E2DED5]"
+                  }`}
+                >
+                  {sub.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Product Cards Grid */}
       {filteredAndSortedProducts.length === 0 ? (
@@ -112,7 +177,8 @@ export default function HomePage() {
           </p>
           <button
             onClick={() => {
-              setSelectedCategory("all");
+              setSelectedDept("all");
+              setSelectedSubCat("all");
               setSearchTerm("");
               setSortOption("featured");
             }}
@@ -122,7 +188,7 @@ export default function HomePage() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-1">
           {filteredAndSortedProducts.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}

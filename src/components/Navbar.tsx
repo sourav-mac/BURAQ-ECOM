@@ -28,11 +28,10 @@ export function Navbar() {
 
   const navLinks = [
     { label: "Shop All", href: "/products" },
-    { label: "Lighting", href: "/category/lighting" },
+    { label: "Lights", href: "/category/lighting" },
     { label: "Wires", href: "/category/wire" },
     { label: "Fans", href: "/category/fan" },
-    { label: "Switches", href: "/category/switch" },
-    { label: "MCB", href: "/category/mcb" },
+    { label: "Electric", href: "/category/switch" },
   ];
 
   return (
