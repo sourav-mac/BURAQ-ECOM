@@ -42,11 +42,6 @@ export default function ProductDetailPage() {
               alt={product.name}
               className="w-full h-full object-cover rounded-xl"
             />
-            {product.tag && (
-              <span className="absolute top-6 left-6 px-3 py-1 rounded-md text-xs font-black uppercase tracking-wider bg-[#07543F] text-[#FFFDEB] shadow-xs">
-                {product.tag}
-              </span>
-            )}
           </div>
         </div>
 

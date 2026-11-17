@@ -5,37 +5,24 @@ import { Product } from "@/data/products";
 export function ProductCard({ product }: { product: Product }) {
   return (
     <div className="rounded-2xl buraq-card flex flex-col overflow-hidden shadow-xs">
-      {/* Product Image & Badges */}
-      <div className="relative aspect-square w-full bg-[#FAF8E4] overflow-hidden p-3 flex items-center justify-center border-b border-[#E2DED5]">
+      {/* Full Edge-to-Edge Image (No inner padding, no borders) */}
+      <div className="relative aspect-square w-full overflow-hidden bg-[#FAF8E4]">
         <img
           src={product.image}
           alt={product.name}
-          className="w-full h-full object-cover rounded-xl"
+          className="w-full h-full object-cover"
         />
 
-        {/* Top Badges */}
-        <div className="absolute top-4 left-4 flex flex-col gap-1.5 items-start">
-          {product.tag && (
-            <span className="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider bg-[#07543F] text-[#FFFDEB] shadow-xs">
-              {product.tag}
-            </span>
-          )}
-          {product.discountPercent > 0 && (
-            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#FDEEE5] text-[#D96B1F] border border-[#D96B1F]/30">
-              {product.discountPercent}% OFF
-            </span>
-          )}
-        </div>
-
-        {/* Category Pill */}
-        <span className="absolute bottom-4 right-4 px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-white text-[#667085] border border-[#E2DED5] uppercase tracking-wider">
-          {product.category}
-        </span>
+        {product.discountPercent > 0 && (
+          <span className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded text-[10px] font-bold bg-[#D96B1F] text-white">
+            {product.discountPercent}% OFF
+          </span>
+        )}
       </div>
 
       {/* Info Block */}
-      <div className="p-5 flex-1 flex flex-col justify-between space-y-4 bg-white">
-        <div className="space-y-1.5">
+      <div className="p-4 flex-1 flex flex-col justify-between space-y-3 bg-white">
+        <div className="space-y-1">
           <div className="flex items-center justify-between text-[11px] text-[#07543F] font-bold uppercase tracking-wider">
             <span>{product.brand}</span>
             <div className="text-[#D96B1F] font-bold">
@@ -56,7 +43,7 @@ export function ProductCard({ product }: { product: Product }) {
         </div>
 
         {/* Price & Action */}
-        <div className="pt-3 border-t border-[#E2DED5] flex items-center justify-between gap-2">
+        <div className="pt-2.5 border-t border-[#E2DED5] flex items-center justify-between gap-2">
           <div>
             <div className="text-base font-black text-[#07543F]">
               ₹{product.price.toLocaleString("en-IN")}
