@@ -40,7 +40,7 @@ export function Navbar() {
       {/* Announcement bar */}
       <div className="bg-[#07543F] text-[#FFFDEB] text-[11px] sm:text-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-8 flex items-center justify-center sm:justify-between tracking-wide">
-          <span className="font-semibold">BURAQ ENTERPRISE — Premium Electricals & Lighting Supplies</span>
+          <span className="font-semibold">Free delivery on orders above ₹499</span>
           <span className="hidden sm:inline text-[#FFFDEB]/80 font-medium">Wholesale Pricing · 100% Verified Quality · Fast Dispatch</span>
         </div>
       </div>
