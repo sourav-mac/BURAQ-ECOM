@@ -29,7 +29,7 @@ export function Navbar() {
     <header className="sticky top-0 z-40 w-full bg-[#FFFDEB] border-b border-[#E2DED5]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
         {/* Brand Logo - Official BURAQ Logo from Landing */}
-        <Link href="/" className="flex items-center gap-2.5 shrink-0">
+        <Link href="/" className="flex items-center shrink-0">
           <Image
             src="/images/buraq-logo.png"
             alt="BURAQ ENTERPRISE"
@@ -38,9 +38,6 @@ export function Navbar() {
             className="h-12 sm:h-14 md:h-15 w-auto object-contain"
             priority
           />
-          <span className="text-[#07543F] text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md bg-[#E7F1EB] border border-[#07543F]/20">
-            Store
-          </span>
         </Link>
 
         {/* Right Action Icons: Cart, Auth & Shop */}
