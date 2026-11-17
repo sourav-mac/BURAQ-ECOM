@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Zap, ShieldCheck, Truck, Headphones, Award } from "lucide-react";
 
 export function Footer() {
@@ -52,14 +53,15 @@ export function Footer() {
         {/* Links Grid */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
           <div className="md:col-span-2 space-y-4">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-[#D96B1F] flex items-center justify-center text-white">
-                <Zap className="w-4 h-4 fill-white" />
-              </div>
-              <span className="text-lg font-black tracking-wider text-white">
-                BURAQ ENTERPRISE
-              </span>
-            </div>
+            <Link href="/" className="inline-block bg-white/95 px-3 py-1.5 rounded-xl">
+              <Image
+                src="/images/buraq-logo.png"
+                alt="BURAQ ENTERPRISE"
+                width={200}
+                height={60}
+                className="h-9 w-auto object-contain"
+              />
+            </Link>
             <p className="text-xs text-white/60 leading-relaxed max-w-sm">
               Eastern India&apos;s leading supplier of energy-efficient commercial lighting, industrial heavy-duty power cables, switchgear protection, and turnkey solar energy systems.
             </p>

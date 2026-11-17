@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { ShoppingBag, User, Zap, Menu, X } from "lucide-react";
+import Image from "next/image";
+import { ShoppingBag, User, Menu, X } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 
@@ -27,19 +28,19 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-40 w-full bg-[#FFFDEB] border-b border-[#E2DED5]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
-        {/* Brand Logo */}
-        <Link href="/" className="flex items-center gap-3 shrink-0">
-          <div className="w-10 h-10 rounded-xl bg-[#07543F] flex items-center justify-center text-[#FFFDEB] shadow-xs">
-            <Zap className="w-5 h-5 fill-[#FFFDEB]" />
-          </div>
-          <div>
-            <span className="text-xl font-black tracking-wider text-[#10201F] flex items-center gap-1.5">
-              BURAQ <span className="text-[#07543F] text-xs font-bold uppercase tracking-widest px-1.5 py-0.5 rounded-sm bg-[#E7F1EB] border border-[#07543F]/20">Store</span>
-            </span>
-            <p className="text-[10px] text-[#667085] tracking-wider font-medium uppercase">
-              Lights • Electricals • Hardware
-            </p>
-          </div>
+        {/* Brand Logo - Official BURAQ Logo from Landing */}
+        <Link href="/" className="flex items-center gap-2.5 shrink-0">
+          <Image
+            src="/images/buraq-logo.png"
+            alt="BURAQ ENTERPRISE"
+            width={240}
+            height={70}
+            className="h-12 sm:h-14 md:h-15 w-auto object-contain"
+            priority
+          />
+          <span className="text-[#07543F] text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md bg-[#E7F1EB] border border-[#07543F]/20">
+            Store
+          </span>
         </Link>
 
         {/* Right Action Icons: Cart, Auth & Shop */}
