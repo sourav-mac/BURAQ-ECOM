@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { X, Plus, Minus, ShoppingBag } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+import { ProductImage } from "./ProductImage";
 
 const inr = (n: number) => `₹${n.toLocaleString("en-IN")}`;
 
@@ -63,10 +64,10 @@ export function CartDrawer() {
             <ul className="flex-1 overflow-y-auto px-6 divide-y divide-[#EFECE3]">
               {items.map(({ product, quantity }) => (
                 <li key={product.id} className="py-5 flex gap-4">
-                  <img
-                    src={product.image}
+                  <ProductImage
+                    src={product.photoUrl}
                     alt={product.name}
-                    className="w-20 h-20 rounded-xl object-cover bg-[#F7F4EE] shrink-0"
+                    className="w-20 h-20 rounded-xl shrink-0"
                   />
                   <div className="flex-1 min-w-0 flex flex-col">
                     <div className="flex justify-between gap-3">
@@ -77,7 +78,7 @@ export function CartDrawer() {
                         {inr(product.price * quantity)}
                       </span>
                     </div>
-                    <p className="text-xs text-[#667085] mt-0.5">{product.brand}</p>
+                    <p className="text-xs text-[#667085] mt-0.5">{product.brand || product.category.name}</p>
 
                     <div className="mt-auto pt-3 flex items-center justify-between">
                       <div className="flex items-center h-8 rounded-lg border border-[#E2DED5]">
@@ -117,7 +118,7 @@ export function CartDrawer() {
                   <dd className="text-[#10201F]">{inr(subtotal)}</dd>
                 </div>
                 <div className="flex justify-between text-[#667085]">
-                  <dt>GST (18%)</dt>
+                  <dt>GST (included)</dt>
                   <dd className="text-[#10201F]">{inr(tax)}</dd>
                 </div>
                 <div className="flex justify-between text-[#667085]">

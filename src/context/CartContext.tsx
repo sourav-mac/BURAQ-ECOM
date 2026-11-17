@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { Product } from "@/data/products";
+import { Product } from "@/lib/api";
 
 export interface CartItem {
   product: Product;
@@ -23,6 +23,8 @@ interface CartContextType {
   setIsCartOpen: (open: boolean) => void;
 }
 
+const CART_KEY = "buraq_shop_cart_v2"; // v2: real products from backend
+
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
@@ -31,7 +33,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem("buraq_ecom_cart");
+      const saved = localStorage.getItem(CART_KEY);
       if (saved) setItems(JSON.parse(saved));
     } catch (e) {
       console.warn("Failed to load cart", e);
@@ -40,7 +42,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     try {
-      localStorage.setItem("buraq_ecom_cart", JSON.stringify(items));
+      localStorage.setItem(CART_KEY, JSON.stringify(items));
     } catch (e) {
       console.warn("Failed to persist cart", e);
     }
@@ -85,10 +87,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     (sum, item) => sum + item.product.price * item.quantity,
     0
   );
-  // 18% standard GST rate included or split
-  const tax = Math.round(subtotal * 0.18);
-  const shipping = subtotal > 1500 || subtotal === 0 ? 0 : 150;
-  const totalAmount = subtotal + tax + shipping;
+  // Prices are MRP (GST-inclusive) — tax is the GST already contained in the subtotal
+  const tax =
+    Math.round(
+      items.reduce((sum, { product, quantity }) => {
+        const gross = product.price * quantity;
+        return sum + (gross - gross / (1 + product.gstPercent / 100));
+      }, 0) * 100
+    ) / 100;
+  const shipping = 0; // free delivery — matches the order total charged by the backend
+  const totalAmount = subtotal;
 
   return (
     <CartContext.Provider

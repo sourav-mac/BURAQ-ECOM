@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState } from "react";
 
-export type SortOption = "featured" | "price-asc" | "price-desc" | "rating";
+export type SortOption = "featured" | "price-asc" | "price-desc" | "newest";
 
 interface FilterContextType {
   searchTerm: string;

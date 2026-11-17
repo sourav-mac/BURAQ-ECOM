@@ -1,124 +1,128 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { useSession, signOut as nextAuthSignOut } from "next-auth/react";
+import { api, tokenStore, ShopUser } from "@/lib/api";
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  role: "CUSTOMER";
-}
+export type User = ShopUser;
+
+type Result = { success: boolean; message?: string };
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, pass: string) => Promise<{ success: boolean; message?: string }>;
-  signup: (name: string, email: string, phone: string, pass: string) => Promise<{ success: boolean; message?: string }>;
-  logout: () => void;
   isLoading: boolean;
+  login: (email: string, pass: string) => Promise<Result>;
+  signup: (name: string, email: string, phone: string, pass: string) => Promise<Result>;
+  logout: () => void;
+  updateProfile: (data: Partial<Omit<User, "id" | "email">>) => Promise<Result>;
+  updateAvatar: (file: File | null) => Promise<Result>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const errMsg = (e: unknown, fallback: string) => (e instanceof Error ? e.message : fallback);
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const { data: session, status: sessionStatus } = useSession();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Restore session from stored token or NextAuth Google session
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem("buraq_ecom_user");
-      if (saved) setUser(JSON.parse(saved));
-    } catch (e) {
-      console.warn("Failed to read user session", e);
-    } finally {
+    if (sessionStatus === "loading") return;
+
+    // Existing BURAQ login (email/password or an earlier Google exchange)
+    if (tokenStore.get()) {
+      api
+        .me()
+        .then(setUser)
+        .catch(() => tokenStore.clear())
+        .finally(() => setIsLoading(false));
+      return;
+    }
+
+    // Fresh Google sign-in: exchange the verified Google ID token for a BURAQ
+    // customer login, so the customer is created in the backend (Retail) and can order.
+    const idToken = (session as any)?.idToken as string | undefined;
+    if (idToken) {
+      api
+        .googleLogin(idToken)
+        .then(({ token, user }) => {
+          tokenStore.set(token);
+          setUser(user);
+        })
+        .catch((e) => {
+          console.warn("Google sign-in exchange failed:", e);
+          nextAuthSignOut({ redirect: false }).catch(() => {});
+          alert(errMsg(e, "Google sign-in failed"));
+        })
+        .finally(() => setIsLoading(false));
+      return;
+    }
+
+    if (!tokenStore.get()) {
       setIsLoading(false);
+      return;
+    }
+
+    api
+      .me()
+      .then(setUser)
+      .catch(() => tokenStore.clear())
+      .finally(() => setIsLoading(false));
+  }, [session, sessionStatus]);
+
+  const login = useCallback(async (email: string, pass: string): Promise<Result> => {
+    try {
+      const { token, user } = await api.login(email, pass);
+      tokenStore.set(token);
+      setUser(user);
+      return { success: true };
+    } catch (e) {
+      return { success: false, message: errMsg(e, "Login failed") };
     }
   }, []);
 
-  const login = async (email: string, pass: string) => {
-    // Check credentials (mocking/local storage authentication for customer portal)
-    if (!email || !pass) {
-      return { success: false, message: "Please fill in email and password." };
-    }
-
+  const signup = useCallback(async (name: string, email: string, phone: string, pass: string): Promise<Result> => {
+    if (pass.length < 6) return { success: false, message: "Password must be at least 6 characters." };
     try {
-      const usersStr = localStorage.getItem("buraq_registered_users");
-      const registered = usersStr ? JSON.parse(usersStr) : [];
-      const found = registered.find((u: any) => u.email.toLowerCase() === email.toLowerCase());
-
-      if (found) {
-        if (found.password === pass) {
-          const authUser: User = { id: found.id, name: found.name, email: found.email, phone: found.phone, role: "CUSTOMER" };
-          setUser(authUser);
-          localStorage.setItem("buraq_ecom_user", JSON.stringify(authUser));
-          return { success: true };
-        } else {
-          return { success: false, message: "Invalid email or password." };
-        }
-      }
-
-      // Default demo customer account if not registered yet
-      if (pass.length >= 6) {
-        const demoUser: User = {
-          id: "cust-" + Date.now(),
-          name: email.split("@")[0].toUpperCase(),
-          email,
-          role: "CUSTOMER",
-        };
-        setUser(demoUser);
-        localStorage.setItem("buraq_ecom_user", JSON.stringify(demoUser));
-        return { success: true };
-      } else {
-        return { success: false, message: "Password must be at least 6 characters." };
-      }
-    } catch (e: any) {
-      return { success: false, message: e.message || "Failed to log in" };
-    }
-  };
-
-  const signup = async (name: string, email: string, phone: string, pass: string) => {
-    if (!name || !email || !pass) {
-      return { success: false, message: "Please fill in all required fields." };
-    }
-    if (pass.length < 6) {
-      return { success: false, message: "Password must be at least 6 characters." };
-    }
-
-    try {
-      const usersStr = localStorage.getItem("buraq_registered_users");
-      const registered = usersStr ? JSON.parse(usersStr) : [];
-      if (registered.some((u: any) => u.email.toLowerCase() === email.toLowerCase())) {
-        return { success: false, message: "An account with this email already exists." };
-      }
-
-      const newUser = {
-        id: "cust-" + Date.now(),
-        name,
-        email,
-        phone,
-        password: pass,
-        role: "CUSTOMER",
-      };
-
-      registered.push(newUser);
-      localStorage.setItem("buraq_registered_users", JSON.stringify(registered));
-
-      const authUser: User = { id: newUser.id, name: newUser.name, email: newUser.email, phone: newUser.phone, role: "CUSTOMER" };
-      setUser(authUser);
-      localStorage.setItem("buraq_ecom_user", JSON.stringify(authUser));
+      const { token, user } = await api.register({ name, email, phone: phone || undefined, password: pass });
+      tokenStore.set(token);
+      setUser(user);
       return { success: true };
-    } catch (e: any) {
-      return { success: false, message: e.message || "Failed to sign up" };
+    } catch (e) {
+      return { success: false, message: errMsg(e, "Sign up failed") };
     }
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
+    tokenStore.clear();
     setUser(null);
-    localStorage.removeItem("buraq_ecom_user");
-  };
+    nextAuthSignOut({ redirect: false }).catch(() => {});
+  }, []);
+
+  const updateProfile = useCallback(async (data: Partial<Omit<User, "id" | "email">>): Promise<Result> => {
+    try {
+      const clean = Object.fromEntries(Object.entries(data).map(([k, v]) => [k, v ?? ""]));
+      setUser(await api.updateMe(clean));
+      return { success: true };
+    } catch (e) {
+      return { success: false, message: errMsg(e, "Could not save") };
+    }
+  }, []);
+
+  // Upload (or remove, with null) the profile photo — stored on Cloudinary via the backend
+  const updateAvatar = useCallback(async (file: File | null): Promise<Result> => {
+    try {
+      setUser(file ? await api.uploadAvatar(file) : await api.removeAvatar());
+      return { success: true };
+    } catch (e) {
+      return { success: false, message: errMsg(e, "Could not update photo") };
+    }
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ user, login, signup, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, isLoading, login, signup, logout, updateProfile, updateAvatar }}>
       {children}
     </AuthContext.Provider>
   );

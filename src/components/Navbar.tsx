@@ -3,50 +3,95 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ShoppingCart, Menu, X, ChevronDown, LogOut, User, Search } from "lucide-react";
+import { usePathname } from "next/navigation";
+import {
+  ShoppingCart,
+  Menu,
+  X,
+  ChevronDown,
+  LogOut,
+  User,
+  Search,
+  LayoutGrid,
+  Lightbulb,
+  Cable,
+  Fan,
+  Zap,
+  Package,
+} from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { useFilter } from "@/context/FilterContext";
+import { useCategories } from "@/lib/useCategories";
+import { UserAvatar } from "./UserAvatar";
 
 export function Navbar() {
+  const pathname = usePathname();
   const { totalItems, setIsCartOpen } = useCart();
   const { user, logout } = useAuth();
   const { searchTerm, setSearchTerm, sortOption, setSortOption } = useFilter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [moreCatOpen, setMoreCatOpen] = useState(false);
 
-  const allCategories = [
-    { label: "LIGHTING", href: "/category/lighting" },
-    { label: "WIRE", href: "/category/wire" },
-    { label: "FAN", href: "/category/fan" },
-    { label: "MCB", href: "/category/mcb" },
-    { label: "SWITCH", href: "/category/switch" },
-    { label: "ACCESSORIES", href: "/category/accessories" },
-    { label: "WALL LAMP", href: "/category/wall-lamp" },
-    { label: "HANGING LAMP", href: "/category/hanging-lamp" },
-    { label: "CEILING LIGHT", href: "/category/ceiling-light" },
-    { label: "OTHERS", href: "/category/others" },
+  // Categories come live from the BURAQ backend (admin-managed)
+  const categories = useCategories();
+  const iconFor = (name: string) => {
+    const n = name.toLowerCase();
+    if (n.includes("light") || n.includes("lamp")) return Lightbulb;
+    if (n.includes("wire") || n.includes("cable")) return Cable;
+    if (n.includes("fan")) return Fan;
+    if (n.includes("solar") || n.includes("electric") || n.includes("switch") || n.includes("mcb")) return Zap;
+    return Package;
+  };
+
+  // Fallback categories list if backend categories haven't loaded yet
+  const defaultCategoryList = [
+    { id: "lighting", name: "Lighting" },
+    { id: "wire", name: "Wire" },
+    { id: "fan", name: "Fan" },
+    { id: "mcb", name: "MCB" },
+    { id: "switch", name: "Switch" },
+    { id: "accessories", name: "Accessories" },
+    { id: "wall-lamp", name: "Wall Lamp" },
+    { id: "hanging-lamp", name: "Hanging Lamp" },
+    { id: "ceiling-light", name: "Ceiling Light" },
   ];
+
+  const activeCategories = categories.length > 0 ? categories : defaultCategoryList;
+  const primaryCategories = activeCategories.slice(0, 5);
+  const overflowCategories = activeCategories.slice(5);
+
+  const allCategories = activeCategories.map((c) => ({
+    label: c.name.toUpperCase(),
+    href: `/category/${c.id}`,
+    name: c.name,
+  }));
 
   const navLinks = [
-    { label: "Shop All", href: "/products" },
-    { label: "Lights", href: "/category/lighting" },
-    { label: "Wires", href: "/category/wire" },
-    { label: "Fans", href: "/category/fan" },
-    { label: "Electric", href: "/category/switch" },
+    { label: "ALL", href: "/products", icon: LayoutGrid },
+    ...primaryCategories.map((c) => ({
+      label: c.name.toUpperCase(),
+      href: `/category/${c.id}`,
+      icon: iconFor(c.name),
+    })),
   ];
+
+  const isOverflowActive = overflowCategories.some(
+    (c) => pathname === `/category/${c.id}` || pathname.startsWith(`/category/${c.id}`)
+  );
 
   return (
     <header className="sticky top-0 z-40 w-full bg-gradient-to-b from-white/70 to-[#FFFDEB]/40 backdrop-blur-2xl backdrop-saturate-[1.8] border-b border-white/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_8px_32px_-12px_rgba(16,32,31,0.18)]">
       {/* Announcement bar */}
       <div className="bg-[#07543F] text-[#FFFDEB] text-[11px] sm:text-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-8 flex items-center justify-center sm:justify-between tracking-wide">
-          <span className="font-semibold">Free delivery on orders above ₹499</span>
-          <span className="hidden sm:inline text-[#FFFDEB]/80 font-medium">Wholesale Pricing · 100% Verified Quality · Fast Dispatch</span>
+          <span className="font-semibold">Free delivery on all orders</span>
+          <span className="hidden sm:inline text-[#FFFDEB]/80 font-medium">Genuine Brands | GST Invoice | Fast Dispatch</span>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4 sm:gap-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3 sm:gap-4">
         <Link href="/" className="flex items-center shrink-0">
           <Image
             src="/images/buraq-logo.png"
@@ -59,29 +104,29 @@ export function Navbar() {
         </Link>
 
         {/* Search & Sort in Navbar */}
-        <div className="flex-1 max-w-xl hidden md:flex items-center h-11 rounded-2xl bg-white border border-[#E2DED5] shadow-xs transition-none">
+        <div className="flex-1 max-w-sm xl:max-w-md hidden md:flex items-center h-10 rounded-2xl bg-white border border-[#E2DED5] shadow-xs transition-none">
           {/* Search Input */}
           <div className="relative flex-1 h-full flex items-center">
-            <Search className="w-[18px] h-[18px] text-[#07543F] absolute left-4 pointer-events-none" />
+            <Search className="w-4 h-4 text-[#07543F] absolute left-3.5 pointer-events-none" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search lights, wires, fans..."
-              className="w-full h-full pl-11 pr-9 bg-transparent text-sm text-[#10201F] placeholder:text-[#667085] focus:outline-none"
+              className="w-full h-full pl-9 pr-8 bg-transparent text-xs text-[#10201F] placeholder:text-[#667085] focus:outline-none"
             />
             {searchTerm && (
               <button
                 onClick={() => setSearchTerm("")}
                 aria-label="Clear search"
-                className="absolute right-2 w-6 h-6 rounded-full text-[#667085] hover:bg-[#10201F]/5 hover:text-[#10201F] flex items-center justify-center cursor-pointer"
+                className="absolute right-2 w-5 h-5 rounded-full text-[#667085] hover:bg-[#10201F]/5 hover:text-[#10201F] flex items-center justify-center cursor-pointer"
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="w-3 h-3" />
               </button>
             )}
           </div>
 
-          <span className="w-px h-6 bg-[#E2DED5]" />
+          <span className="w-px h-5 bg-[#E2DED5]" />
 
           {/* Sort Dropdown */}
           <div className="relative shrink-0 h-full flex items-center">
@@ -89,82 +134,172 @@ export function Navbar() {
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value as any)}
               aria-label="Sort products"
-              className="appearance-none h-full pl-4 pr-9 bg-transparent text-sm font-medium text-[#10201F] focus:outline-none cursor-pointer rounded-r-2xl"
+              className="appearance-none h-full pl-3 pr-7 bg-transparent text-xs font-medium text-[#10201F] focus:outline-none cursor-pointer rounded-r-2xl"
             >
               <option value="featured">Featured</option>
               <option value="price-asc">Price: Low → High</option>
               <option value="price-desc">Price: High → Low</option>
-              <option value="rating">Top Rated</option>
+              <option value="newest">Newest</option>
             </select>
-            <ChevronDown className="pointer-events-none absolute right-3 w-4 h-4 text-[#667085]" />
+            <ChevronDown className="pointer-events-none absolute right-2.5 w-3.5 h-3.5 text-[#667085]" />
           </div>
         </div>
 
-        {/* Desktop nav links */}
-        <nav className="hidden xl:flex items-center gap-5">
-          {navLinks.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              className="text-xs font-bold tracking-wide uppercase text-[#10201F]/80 hover:text-[#07543F] transition-colors"
+        {/* Desktop nav links - compact category pills */}
+        <nav className="hidden lg:flex items-center gap-1">
+          {navLinks.map((l) => {
+            const isActive =
+              pathname === l.href ||
+              (l.href === "/products" && pathname === "/") ||
+              (l.href.startsWith("/category/") && pathname.startsWith(l.href));
+            const IconComponent = l.icon;
+            return (
+              <Link
+                key={l.href}
+                href={l.href}
+                className={`text-[11px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full transition-all flex items-center gap-1 shrink-0 ${
+                  isActive
+                    ? "bg-[#07543F] text-[#FFFDEB] shadow-sm ring-1 ring-[#07543F]"
+                    : "text-[#10201F]/75 hover:text-[#07543F] hover:bg-black/5"
+                }`}
+              >
+                {isActive && <IconComponent className="w-3 h-3 stroke-[2.5]" />}
+                <span>{l.label}</span>
+              </Link>
+            );
+          })}
+
+          {/* Overflow "MORE" category dropdown */}
+          {overflowCategories.length > 0 && (
+            <div
+              className="relative group"
+              onMouseEnter={() => setMoreCatOpen(true)}
+              onMouseLeave={() => setMoreCatOpen(false)}
             >
-              {l.label}
-            </Link>
-          ))}
+              <button
+                type="button"
+                onClick={() => setMoreCatOpen((o) => !o)}
+                className={`text-[11px] font-bold tracking-wider uppercase px-2 py-1 rounded-full transition-all flex items-center gap-1 cursor-pointer shrink-0 ${
+                  isOverflowActive
+                    ? "bg-[#07543F] text-[#FFFDEB] shadow-sm ring-1 ring-[#07543F]"
+                    : "text-[#10201F]/75 hover:text-[#07543F] hover:bg-black/5"
+                }`}
+              >
+                <span>MORE</span>
+                <ChevronDown className="w-3 h-3 transition-transform duration-200 group-hover:rotate-180" />
+              </button>
+
+              <div
+                className={`absolute right-0 top-full pt-1.5 w-44 z-50 transition-all duration-150 ${
+                  moreCatOpen ? "opacity-100 visible pointer-events-auto" : "opacity-0 invisible pointer-events-none"
+                }`}
+              >
+                <div className="rounded-xl bg-white border border-[#E2DED5] shadow-lg overflow-hidden py-1">
+                  {overflowCategories.map((c) => {
+                    const isCatActive = pathname === `/category/${c.id}`;
+                    return (
+                      <Link
+                        key={c.id}
+                        href={`/category/${c.id}`}
+                        onClick={() => setMoreCatOpen(false)}
+                        className={`flex items-center justify-between px-3 py-1.5 text-[11px] font-semibold transition-colors ${
+                          isCatActive
+                            ? "bg-[#FAF8E4] text-[#07543F] font-bold"
+                            : "text-[#10201F] hover:bg-[#FAF8E4] hover:text-[#07543F]"
+                        }`}
+                      >
+                        <span>{c.name}</span>
+                        {isCatActive && <span className="w-1.5 h-1.5 rounded-full bg-[#07543F]" />}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
         </nav>
 
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
           {user ? (
-            <div className="relative hidden sm:block">
+            <div
+              className="relative hidden sm:block group"
+              onMouseEnter={() => setUserMenuOpen(true)}
+              onMouseLeave={() => setUserMenuOpen(false)}
+            >
               <button
                 onClick={() => setUserMenuOpen((o) => !o)}
-                className="flex items-center gap-2 h-10 pl-1 pr-3 rounded-full hover:bg-[#F2F7F4] cursor-pointer"
+                className="flex items-center gap-1.5 h-9 pl-1 pr-2.5 rounded-full hover:bg-[#F2F7F4] cursor-pointer"
               >
-                <span className="w-8 h-8 rounded-full bg-[#07543F] text-white flex items-center justify-center text-sm font-semibold">
-                  {user.name.slice(0, 1).toUpperCase()}
-                </span>
-                <span className="text-sm font-medium text-[#10201F] max-w-[110px] truncate">{user.name}</span>
-                <ChevronDown className="w-4 h-4 text-[#667085]" />
+                <UserAvatar name={user.name} src={user.avatarUrl} className="w-7 h-7 text-xs" />
+                <span className="text-xs font-medium text-[#10201F] max-w-[90px] truncate">{user.name}</span>
+                <ChevronDown className="w-3.5 h-3.5 text-[#667085] transition-transform duration-200 group-hover:rotate-180" />
               </button>
-              {userMenuOpen && (
-                <>
-                  <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />
-                  <div className="absolute right-0 mt-2 w-56 z-50 rounded-xl bg-white border border-[#E2DED5] shadow-lg py-2">
-                    <div className="px-4 py-2 border-b border-[#EFECE3]">
-                      <p className="text-sm font-semibold text-[#10201F] truncate">{user.name}</p>
-                      <p className="text-xs text-[#667085] truncate">{user.email}</p>
-                    </div>
+
+              {/* Dropdown Menu - Opens on Hover & Click */}
+              <div
+                className={`absolute right-0 pt-1 w-56 z-50 transition-all duration-150 ${
+                  userMenuOpen ? "opacity-100 visible pointer-events-auto" : "opacity-0 invisible pointer-events-none"
+                }`}
+              >
+                <div className="rounded-2xl bg-white border border-[#E2DED5] shadow-xl overflow-hidden py-1.5">
+                  <div className="px-4 py-2 bg-[#FAF8E4]/60 border-b border-[#E2DED5]">
+                    <p className="text-[10px] font-black uppercase text-[#07543F] tracking-wider">Welcome</p>
+                    <p className="text-xs font-bold text-[#10201F] truncate mt-0.5">{user.name}</p>
+                  </div>
+
+                  <div className="py-1">
+                    <Link
+                      href="/profile"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2 px-3.5 py-1.5 text-xs font-bold text-[#10201F] hover:bg-[#FAF8E4] hover:text-[#07543F] transition-colors"
+                    >
+                      <User className="w-3.5 h-3.5 text-[#07543F]" />
+                      <span>My Profile</span>
+                    </Link>
+
+                    <Link
+                      href="/orders"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2 px-3.5 py-1.5 text-xs font-bold text-[#10201F] hover:bg-[#FAF8E4] hover:text-[#07543F] transition-colors"
+                    >
+                      <Package className="w-3.5 h-3.5 text-[#07543F]" />
+                      <span>My Orders</span>
+                    </Link>
+                  </div>
+
+                  <div className="pt-1 border-t border-[#E2DED5]">
                     <button
                       onClick={() => {
                         logout();
                         setUserMenuOpen(false);
                       }}
-                      className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-[#10201F] hover:bg-[#F7F4EE] cursor-pointer"
+                      className="w-full flex items-center gap-2 px-3.5 py-2 text-xs font-bold text-[#D96B1F] hover:bg-[#FDEEE5] transition-colors cursor-pointer"
                     >
-                      <LogOut className="w-4 h-4" /> Sign out
+                      <LogOut className="w-3.5 h-3.5" />
+                      <span>Sign out</span>
                     </button>
                   </div>
-                </>
-              )}
+                </div>
+              </div>
             </div>
           ) : (
             <Link
               href="/signin"
-              className="hidden sm:inline-flex items-center gap-2 h-10 px-4 rounded-full border border-[#E2DED5] bg-white text-sm font-medium text-[#10201F] hover:border-[#07543F]"
+              className="hidden sm:inline-flex items-center gap-1.5 h-9 px-3 rounded-full border border-[#E2DED5] bg-white text-xs font-medium text-[#10201F] hover:border-[#07543F]"
             >
-              <User className="w-4 h-4" /> Sign in
+              <User className="w-3.5 h-3.5" /> Sign in
             </Link>
           )}
 
           <button
             onClick={() => setIsCartOpen(true)}
-            className="relative h-10 px-3 sm:px-4 rounded-full bg-[#07543F] hover:bg-[#053E2E] text-white flex items-center gap-2 cursor-pointer transition-colors"
+            className="relative h-9 px-3 rounded-full bg-[#07543F] hover:bg-[#053E2E] text-white flex items-center gap-1.5 cursor-pointer transition-colors text-xs font-medium"
             aria-label="Shopping Cart"
           >
-            <ShoppingCart className="w-5 h-5" />
-            <span className="hidden sm:inline text-sm font-medium">Cart</span>
+            <ShoppingCart className="w-4 h-4" />
+            <span className="hidden sm:inline">Cart</span>
             {totalItems > 0 && (
-              <span className="min-w-[20px] h-5 px-1.5 bg-[#D96B1F] text-white text-[11px] font-bold rounded-full flex items-center justify-center">
+              <span className="min-w-[18px] h-4 px-1 bg-[#D96B1F] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                 {totalItems}
               </span>
             )}
@@ -192,7 +327,7 @@ export function Navbar() {
                 key={cat.href}
                 href={cat.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="px-2.5 py-2 rounded-lg text-xs font-bold text-[#10201F] bg-[#FAF8E4] border border-[#E2DED5]"
+                className="px-2.5 py-1.5 rounded-lg text-xs font-bold text-[#10201F] bg-[#FAF8E4] border border-[#E2DED5]"
               >
                 {cat.label}
               </Link>
