@@ -100,20 +100,6 @@ export default function HomePage() {
               ▼
             </div>
           </div>
-
-          {/* Reset Action */}
-          {(selectedCategory !== "all" || searchTerm || sortOption !== "featured") && (
-            <button
-              onClick={() => {
-                setSelectedCategory("all");
-                setSearchTerm("");
-                setSortOption("featured");
-              }}
-              className="px-2.5 py-1.5 rounded-full text-xs font-bold text-[#D96B1F] bg-[#FDEEE5] border border-[#D96B1F]/30 cursor-pointer whitespace-nowrap"
-            >
-              Reset
-            </button>
-          )}
         </div>
       </div>
 

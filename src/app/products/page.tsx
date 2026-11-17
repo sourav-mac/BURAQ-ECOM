@@ -82,19 +82,6 @@ export default function ProductsCatalogPage() {
               ▼
             </div>
           </div>
-
-          {(selectedCategory !== "all" || searchTerm || sortOption !== "featured") && (
-            <button
-              onClick={() => {
-                setSelectedCategory("all");
-                setSearchTerm("");
-                setSortOption("featured");
-              }}
-              className="px-3 py-2 rounded-full text-xs font-bold text-[#D96B1F] bg-[#FDEEE5] border border-[#D96B1F]/30 cursor-pointer whitespace-nowrap"
-            >
-              Reset
-            </button>
-          )}
         </div>
       </div>
 
