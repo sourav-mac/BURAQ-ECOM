@@ -98,12 +98,12 @@ export default function ProductsCatalogPage() {
             )}
           </div>
 
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar">
+          <div className="flex flex-wrap items-center gap-2">
             {CATEGORIES.map((c) => (
               <button
                 key={c.id}
                 onClick={() => setSelectedCategory(c.id)}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap cursor-pointer shrink-0 ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap cursor-pointer transition-none ${
                   selectedCategory === c.id
                     ? "bg-[#07543F] text-[#FFFDEB] shadow-xs"
                     : "bg-[#FAF8E4] border border-[#E2DED5] text-[#10201F]"

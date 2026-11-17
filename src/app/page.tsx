@@ -112,35 +112,22 @@ export default function HomePage() {
             )}
           </div>
 
-          {/* 10 Required Categories + All */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar">
+          {/* 10 Required Categories + All - Wrapped without scroll, numbers removed */}
+          <div className="flex flex-wrap items-center gap-2">
             {CATEGORIES.map((cat) => {
               const isSelected = selectedCategory === cat.id;
-              const count =
-                cat.id === "all"
-                  ? PRODUCTS.length
-                  : PRODUCTS.filter((p) => p.category === cat.id).length;
 
               return (
                 <button
                   key={cat.id}
                   onClick={() => setSelectedCategory(cat.id)}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-1.5 cursor-pointer shrink-0 ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap cursor-pointer transition-none ${
                     isSelected
                       ? "bg-[#07543F] text-[#FFFDEB] shadow-xs"
                       : "bg-[#FAF8E4] border border-[#E2DED5] text-[#10201F]"
                   }`}
                 >
-                  <span>{cat.label}</span>
-                  <span
-                    className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                      isSelected
-                        ? "bg-[#FFFDEB]/20 text-white"
-                        : "bg-[#E2DED5] text-[#10201F]/70"
-                    }`}
-                  >
-                    {count}
-                  </span>
+                  {cat.label}
                 </button>
               );
             })}
