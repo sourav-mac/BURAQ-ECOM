@@ -177,8 +177,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
+const AUTH_FALLBACK: AuthContextType = {
+  user: null,
+  isLoading: false,
+  login: async () => ({ success: false }),
+  signup: async () => ({ success: false }),
+  verifySignup: async () => ({ success: false }),
+  requestPasswordReset: async () => ({ success: false }),
+  resetPassword: async () => ({ success: false }),
+  logout: () => {},
+  updateProfile: async () => ({ success: false }),
+  updateAvatar: async () => ({ success: false }),
+};
+
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used inside an AuthProvider");
-  return ctx;
+  // Outside AuthProvider (e.g. Next.js /_global-error prerender): return a safe no-op fallback
+  return ctx ?? AUTH_FALLBACK;
 }
