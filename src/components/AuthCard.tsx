@@ -10,6 +10,9 @@ import { clean, check, validate, fieldErrorCls } from "@/lib/validation";
 
 type Mode = "login" | "signup";
 
+const MAX_ATTEMPTS = 5;
+const LOCK_SECONDS = 30;
+
 const inputCls =
   "w-full h-10 px-4 bg-white rounded-full border border-[#D9D3C4] hover:border-[#86948a] focus:border-[#07543F] focus:ring-2 focus:ring-[#07543F]/10 text-sm text-[#10201F] placeholder:text-[#9AA19C] focus:outline-none transition-colors";
 const labelCls = "block text-xs font-semibold text-[#445048] mb-1.5 ml-1";
@@ -38,6 +41,43 @@ export function AuthCard({ initialMode }: { initialMode: Mode }) {
   const [forgot, setForgot] = useState<null | "email" | "code">(null);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  // Rate limiting lockout state
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [lockRemaining, setLockRemaining] = useState(0);
+
+  useEffect(() => {
+    try {
+      const rawLock = localStorage.getItem("buraq_ecom_lock_until");
+      if (rawLock) {
+        const diff = Math.ceil((parseInt(rawLock, 10) - Date.now()) / 1000);
+        if (diff > 0) setLockRemaining(diff);
+        else localStorage.removeItem("buraq_ecom_lock_until");
+      }
+      const rawAttempts = localStorage.getItem("buraq_ecom_failed_attempts");
+      if (rawAttempts) setFailedAttempts(parseInt(rawAttempts, 10) || 0);
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    if (lockRemaining <= 0) return;
+    const timer = setInterval(() => {
+      setLockRemaining((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          try {
+            localStorage.removeItem("buraq_ecom_lock_until");
+            localStorage.removeItem("buraq_ecom_failed_attempts");
+          } catch {}
+          setFailedAttempts(0);
+          setError(null);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [lockRemaining]);
 
   const openForgot = () => {
     setForgot("email");
@@ -110,6 +150,10 @@ export function AuthCard({ initialMode }: { initialMode: Mode }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isSignup && lockRemaining > 0) {
+      setError(`Too many failed attempts. Please wait ${lockRemaining}s before trying again.`);
+      return;
+    }
     const errs = validate({
       name: isSignup ? check.name(name) : null,
       phone: isSignup ? check.phone(phone, false) : null,
@@ -136,8 +180,35 @@ export function AuthCard({ initialMode }: { initialMode: Mode }) {
     }
     const res = await login(email.trim(), password);
     setIsLoading(false);
-    if (res.success) handleSuccessRedirect();
-    else setError(res.message || "Something went wrong.");
+    if (res.success) {
+      try {
+        localStorage.removeItem("buraq_ecom_failed_attempts");
+        localStorage.removeItem("buraq_ecom_lock_until");
+      } catch {}
+      setFailedAttempts(0);
+      setLockRemaining(0);
+      handleSuccessRedirect();
+    } else {
+      const newCount = failedAttempts + 1;
+      setFailedAttempts(newCount);
+      try {
+        localStorage.setItem("buraq_ecom_failed_attempts", String(newCount));
+      } catch {}
+
+      const isRateLimited = Boolean(res.message?.toLowerCase().includes("too many"));
+      if (newCount >= MAX_ATTEMPTS || isRateLimited) {
+        const lockUntil = Date.now() + LOCK_SECONDS * 1000;
+        try {
+          localStorage.setItem("buraq_ecom_lock_until", String(lockUntil));
+        } catch {}
+        setLockRemaining(LOCK_SECONDS);
+        setError(`Too many failed attempts. Login temporarily locked for ${LOCK_SECONDS} seconds.`);
+      } else {
+        const left = MAX_ATTEMPTS - newCount;
+        const msg = res.message || "Invalid email or password.";
+        setError(`${msg} (${left} attempt${left === 1 ? "" : "s"} remaining)`);
+      }
+    }
   };
 
   const handleVerify = async (e?: React.FormEvent) => {
@@ -516,13 +587,13 @@ export function AuthCard({ initialMode }: { initialMode: Mode }) {
 
             <button
               type="submit"
-              disabled={isLoading || isGoogleLoading}
-              className="w-full h-11 !mt-5 rounded-full bg-[#07543F] hover:bg-[#053E2E] active:scale-[0.99] text-white text-sm font-semibold transition-all shadow-[0_8px_20px_rgba(7,84,63,0.25)] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
+              disabled={isLoading || isGoogleLoading || (!isSignup && lockRemaining > 0)}
+              className="w-full h-11 !mt-5 rounded-full bg-[#07543F] hover:bg-[#053E2E] active:scale-[0.99] text-white text-sm font-semibold transition-all shadow-[0_8px_20px_rgba(7,84,63,0.25)] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
             >
               {isLoading && (
                 <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               )}
-              {isSignup ? "Continue" : "Log in"}
+              {isSignup ? "Continue" : lockRemaining > 0 ? `Locked (${lockRemaining}s)` : "Log in"}
             </button>
           </form>
 
