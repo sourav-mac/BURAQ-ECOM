@@ -27,6 +27,14 @@ export const metadata: Metadata = {
   title: "BURAQ Enterprise | Lights, Electricals & Solar E-Commerce",
   description:
     "Direct B2C & commercial store for premium LED lighting, heavy-duty electrical switchgear, power cables, and tier-1 solar photovoltaic energy systems.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/icon.png", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-icon.png" }],
+  },
 };
 
 export default function RootLayout({
