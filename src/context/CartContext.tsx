@@ -180,6 +180,22 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
 export function useCart() {
   const ctx = useContext(CartContext);
-  if (!ctx) throw new Error("useCart must be used inside a CartProvider");
+  if (!ctx) {
+    // Outside CartProvider (e.g. Next.js /_global-error prerender): return a safe no-op fallback
+    return {
+      items: [] as CartItem[],
+      addToCart: () => {},
+      removeFromCart: () => {},
+      updateQuantity: () => {},
+      clearCart: () => {},
+      totalItems: 0,
+      subtotal: 0,
+      tax: 0,
+      shipping: 0,
+      totalAmount: 0,
+      isCartOpen: false,
+      setIsCartOpen: () => {},
+    } satisfies CartContextType;
+  }
   return ctx;
 }

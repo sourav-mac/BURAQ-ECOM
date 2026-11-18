@@ -34,7 +34,13 @@ export function FilterProvider({ children }: { children: React.ReactNode }) {
 export function useFilter() {
   const context = useContext(FilterContext);
   if (!context) {
-    throw new Error("useFilter must be used within a FilterProvider");
+    // Outside FilterProvider (e.g. Next.js /_global-error prerender): return a safe no-op fallback
+    return {
+      searchTerm: "",
+      setSearchTerm: () => {},
+      sortOption: "featured" as SortOption,
+      setSortOption: () => {},
+    } satisfies FilterContextType;
   }
   return context;
 }
