@@ -8,11 +8,17 @@ const STORAGE_KEY = "buraq_shop_categories";
 let cache: Category[] | null = null;
 let inflight: Promise<Category[]> | null = null;
 
+function normalizeCategories(cats: Category[]): Category[] {
+  return cats.map((c) =>
+    c.name.toLowerCase() === "ceiling light" ? { ...c, name: "Decorative Light" } : c
+  );
+}
+
 function readStored(): Category[] | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     const parsed = raw ? JSON.parse(raw) : null;
-    return Array.isArray(parsed) ? parsed : null;
+    return Array.isArray(parsed) ? normalizeCategories(parsed) : null;
   } catch {
     return null;
   }
@@ -35,11 +41,12 @@ export function useCategories() {
       setLoaded(true);
     }
     inflight ??= api.categories().then((c) => {
-      cache = c;
+      const normalized = normalizeCategories(c);
+      cache = normalized;
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(c));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
       } catch {}
-      return c;
+      return normalized;
     });
     inflight
       .then((c) => {

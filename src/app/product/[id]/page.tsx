@@ -90,7 +90,10 @@ function ProductDetailContent({ id }: { id: string }) {
 
   const specs = [
     { key: "Item code", value: product.materialCode },
-    { key: "Category", value: product.category.name },
+    {
+      key: "Category",
+      value: product.category.name.toLowerCase() === "ceiling light" ? "Decorative Light" : product.category.name,
+    },
     { key: "Brand", value: product.brand || "—" },
     { key: "Unit", value: product.unit },
     { key: "GST", value: `${product.gstPercent}%` },
