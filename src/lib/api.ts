@@ -83,7 +83,11 @@ export interface ShopOrder {
 }
 
 export class ApiError extends Error {
-  constructor(message: string, public status: number) {
+  constructor(
+    message: string,
+    public status: number,
+    public retryAfter?: number
+  ) {
     super(message);
   }
 }
@@ -125,7 +129,19 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<{ data:
   }
   const body = await res.json().catch(() => ({}));
   if (!res.ok || body.success === false) {
-    throw new ApiError(friendlyMessage(body.message, res.status), res.status);
+    const retryHeader = res.headers.get("retry-after");
+    const parsedRetry = retryHeader ? parseInt(retryHeader, 10) : undefined;
+    const retryAfter = body.retryAfter ?? (Number.isFinite(parsedRetry) ? parsedRetry : undefined);
+
+    if (res.status === 429) {
+      const waitSec = retryAfter || 60;
+      throw new ApiError(
+        body.message || `Too many failed attempts. Please wait ${waitSec} seconds before trying again.`,
+        res.status,
+        waitSec
+      );
+    }
+    throw new ApiError(friendlyMessage(body.message, res.status), res.status, retryAfter);
   }
   return { data: body.data as T, meta: body.meta };
 }

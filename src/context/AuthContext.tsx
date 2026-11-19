@@ -6,7 +6,7 @@ import { api, tokenStore, ShopUser } from "@/lib/api";
 
 export type User = ShopUser;
 
-type Result = { success: boolean; message?: string };
+type Result = { success: boolean; message?: string; status?: number; retryAfter?: number };
 
 interface AuthContextType {
   user: User | null;
@@ -99,8 +99,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       tokenStore.set(token);
       setUser(user);
       return { success: true };
-    } catch (e) {
-      return { success: false, message: errMsg(e, "Login failed") };
+    } catch (e: any) {
+      return {
+        success: false,
+        message: errMsg(e, "Login failed"),
+        status: e?.status,
+        retryAfter: e?.retryAfter,
+      };
     }
   }, []);
 

@@ -189,24 +189,41 @@ export function AuthCard({ initialMode }: { initialMode: Mode }) {
       setLockRemaining(0);
       handleSuccessRedirect();
     } else {
-      const newCount = failedAttempts + 1;
-      setFailedAttempts(newCount);
-      try {
-        localStorage.setItem("buraq_ecom_failed_attempts", String(newCount));
-      } catch {}
+      const isRateLimited =
+        res.status === 429 ||
+        Boolean(res.message?.toLowerCase().includes("too many"));
 
-      const isRateLimited = Boolean(res.message?.toLowerCase().includes("too many"));
-      if (newCount >= MAX_ATTEMPTS || isRateLimited) {
-        const lockUntil = Date.now() + LOCK_SECONDS * 1000;
+      if (isRateLimited) {
+        const cooldown =
+          typeof res.retryAfter === "number" && res.retryAfter > 0
+            ? res.retryAfter
+            : 60;
+        const lockUntil = Date.now() + cooldown * 1000;
         try {
           localStorage.setItem("buraq_ecom_lock_until", String(lockUntil));
         } catch {}
-        setLockRemaining(LOCK_SECONDS);
-        setError(`Too many failed attempts. Login temporarily locked for ${LOCK_SECONDS} seconds.`);
+        setLockRemaining(cooldown);
+        setError(`Too many failed attempts. Login temporarily locked for ${cooldown} seconds.`);
       } else {
-        const left = MAX_ATTEMPTS - newCount;
-        const msg = res.message || "Invalid email or password.";
-        setError(`${msg} (${left} attempt${left === 1 ? "" : "s"} remaining)`);
+        const newCount = failedAttempts + 1;
+        setFailedAttempts(newCount);
+        try {
+          localStorage.setItem("buraq_ecom_failed_attempts", String(newCount));
+        } catch {}
+
+        if (newCount >= MAX_ATTEMPTS) {
+          const cooldown = 60;
+          const lockUntil = Date.now() + cooldown * 1000;
+          try {
+            localStorage.setItem("buraq_ecom_lock_until", String(lockUntil));
+          } catch {}
+          setLockRemaining(cooldown);
+          setError(`Too many failed attempts. Login temporarily locked for ${cooldown} seconds.`);
+        } else {
+          const left = MAX_ATTEMPTS - newCount;
+          const msg = res.message || "Invalid email or password.";
+          setError(`${msg} (${left} attempt${left === 1 ? "" : "s"} remaining)`);
+        }
       }
     }
   };
