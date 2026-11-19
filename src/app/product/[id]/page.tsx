@@ -188,7 +188,18 @@ function ProductDetailContent({ id }: { id: string }) {
         <div className="flex flex-col justify-center space-y-4 max-w-xl 2xl:max-w-2xl 3xl:max-w-3xl">
           <div>
             <div className="text-xs font-bold uppercase tracking-wider text-[#07543F]">{product.brand || "BURAQ"}</div>
-            <h1 className="mt-1 text-xl sm:text-2xl font-black text-[#10201F] leading-snug">{product.name}</h1>
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4 mt-1">
+              <h1 className="text-xl sm:text-2xl font-black text-[#10201F] leading-snug flex-1">
+                {product.name}
+              </h1>
+              {product.extraDetails && (
+                <div className="sm:text-right shrink-0 max-w-full sm:max-w-xs self-start">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#07543F]/10 border border-[#07543F]/25 text-[#07543F] text-xs font-bold tracking-wide shadow-2xs">
+                    {product.extraDetails}
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="flex items-baseline gap-3 py-2 border-y border-[#E2DED5]">

@@ -19,6 +19,7 @@ export interface Product {
   images?: Array<{ id: string; publicUrl: string; imageType?: string }>;
   unit: string;
   description: string | null;
+  extraDetails?: string | null;
   gstPercent: number;
   price: number; // BURAQ selling price, GST-inclusive
   /** Real MRP printed on the package (Worklane) — only set when higher than `price` */
