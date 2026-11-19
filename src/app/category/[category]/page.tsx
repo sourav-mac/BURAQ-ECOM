@@ -1,14 +1,10 @@
 "use client";
 
-import React, { Suspense, use } from "react";
-import { useRouter } from "next/navigation";
+import React, { Suspense } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { ProductGrid } from "@/components/ProductGrid";
 import { useCategories } from "@/lib/useCategories";
-
-interface PageProps {
-  params: Promise<{ category: string }>;
-}
 
 function CategoryContent({ categoryId }: { categoryId: string }) {
   const router = useRouter();
@@ -36,15 +32,13 @@ function CategoryContent({ categoryId }: { categoryId: string }) {
   );
 }
 
-function CategoryParamsResolver({ params }: PageProps) {
-  const unwrapped = use(params);
-  return <CategoryContent categoryId={unwrapped.category} />;
-}
+export default function CategoryPage() {
+  const params = useParams();
+  const categoryId = typeof params?.category === "string" ? params.category : Array.isArray(params?.category) ? params.category[0] : "";
 
-export default function CategoryPage({ params }: PageProps) {
   return (
     <Suspense fallback={<div className="flex-1 flex flex-col py-10" />}>
-      <CategoryParamsResolver params={params} />
+      <CategoryContent categoryId={categoryId} />
     </Suspense>
   );
 }

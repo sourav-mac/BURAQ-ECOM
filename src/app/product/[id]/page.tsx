@@ -1,16 +1,12 @@
 "use client";
 
-import React, { Suspense, use, useEffect, useMemo, useState } from "react";
+import React, { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Plus, Minus, ShoppingCart, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { api, inr, ProductDetail } from "@/lib/api";
 import { useCart } from "@/context/CartContext";
 import { ProductImage } from "@/components/ProductImage";
-
-interface PageProps {
-  params: Promise<{ id: string }>;
-}
 
 function ProductDetailSkeleton() {
   return (
@@ -188,16 +184,14 @@ function ProductDetailContent({ id }: { id: string }) {
         <div className="flex flex-col justify-center space-y-4 max-w-xl 2xl:max-w-2xl 3xl:max-w-3xl">
           <div>
             <div className="text-xs font-bold uppercase tracking-wider text-[#07543F]">{product.brand || "BURAQ"}</div>
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4 mt-1">
-              <h1 className="text-xl sm:text-2xl font-black text-[#10201F] leading-snug flex-1">
+            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mt-1">
+              <h1 className="text-xl sm:text-2xl font-black text-[#10201F] leading-snug">
                 {product.name}
               </h1>
               {product.extraDetails && (
-                <div className="sm:text-right shrink-0 max-w-full sm:max-w-xs self-start">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#07543F]/10 border border-[#07543F]/25 text-[#07543F] text-xs font-bold tracking-wide shadow-2xs">
-                    {product.extraDetails}
-                  </span>
-                </div>
+                <span className="text-xs sm:text-sm font-bold text-[#07543F] leading-snug">
+                  {product.extraDetails}
+                </span>
               )}
             </div>
           </div>
@@ -278,15 +272,13 @@ function ProductDetailContent({ id }: { id: string }) {
   );
 }
 
-function PageParamsResolver({ params }: PageProps) {
-  const unwrapped = use(params);
-  return <ProductDetailContent id={unwrapped.id} />;
-}
+export default function ProductDetailPage() {
+  const params = useParams();
+  const id = typeof params?.id === "string" ? params.id : Array.isArray(params?.id) ? params.id[0] : "";
 
-export default function ProductDetailPage({ params }: PageProps) {
   return (
     <Suspense fallback={<ProductDetailSkeleton />}>
-      <PageParamsResolver params={params} />
+      <ProductDetailContent id={id} />
     </Suspense>
   );
 }
