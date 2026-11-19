@@ -2,13 +2,14 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Plus, Minus, ShoppingCart, Check } from "lucide-react";
 import { api, inr, ProductDetail } from "@/lib/api";
 import { useCart } from "@/context/CartContext";
 import { ProductImage } from "@/components/ProductImage";
 
 export default function ProductDetailPage() {
+  const router = useRouter();
   const params = useParams();
   const id = String(params?.id || "");
   const { addToCart } = useCart();
@@ -71,10 +72,20 @@ export default function ProductDetailPage() {
   return (
     <div className="w-full flex-1 flex flex-col justify-center px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-3 md:py-6">
       <div className="mb-2">
-        <Link href="/" className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#667085] hover:text-[#07543F]">
+        <button
+          type="button"
+          onClick={() => {
+            if (typeof window !== "undefined" && window.history.length > 1) {
+              router.back();
+            } else {
+              router.push("/");
+            }
+          }}
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#667085] hover:text-[#07543F] transition-colors cursor-pointer"
+        >
           <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Back to catalog</span>
-        </Link>
+          <span>Back</span>
+        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-center">

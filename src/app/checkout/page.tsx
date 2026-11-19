@@ -180,10 +180,20 @@ export default function CheckoutPage() {
   return (
     <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 py-6 flex-1 flex flex-col justify-center">
       <div className="mb-4">
-        <Link href="/products" className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#667085] hover:text-[#07543F]">
+        <button
+          type="button"
+          onClick={() => {
+            if (typeof window !== "undefined" && window.history.length > 1) {
+              router.back();
+            } else {
+              router.push("/products");
+            }
+          }}
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#667085] hover:text-[#07543F] transition-colors cursor-pointer"
+        >
           <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Back to catalog</span>
-        </Link>
+          <span>Back</span>
+        </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6 lg:gap-10 items-start">
