@@ -5,7 +5,7 @@ import Image from "next/image";
 export function Footer() {
   return (
     <footer className="w-full bg-[#071F1B] border-t border-[#0A2E28] text-white/70 pt-12 pb-10 mt-auto">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+      <div className="max-w-[2000px] 2xl:max-w-[2400px] 3xl:max-w-[2600px] mx-auto px-4 sm:px-6 lg:px-8 2xl:px-12 space-y-10">
         {/* Links Grid */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
           <div className="md:col-span-2 space-y-4">

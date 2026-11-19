@@ -15,6 +15,8 @@ export interface Product {
   name: string;
   brand: string | null;
   photoUrl: string | null;
+  photos?: string[];
+  images?: Array<{ id: string; publicUrl: string; imageType?: string }>;
   unit: string;
   description: string | null;
   gstPercent: number;

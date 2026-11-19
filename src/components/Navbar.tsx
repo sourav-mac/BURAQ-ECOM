@@ -74,13 +74,13 @@ export function Navbar() {
     <header className="sticky top-0 z-40 w-full bg-gradient-to-b from-white/70 to-[#FFFDEB]/40 backdrop-blur-2xl backdrop-saturate-[1.8] border-b border-white/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_8px_32px_-12px_rgba(16,32,31,0.18)]">
       {/* Announcement bar */}
       <div className="bg-[#07543F] text-[#FFFDEB] text-[11px] sm:text-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-8 flex items-center justify-center sm:justify-between tracking-wide">
+        <div className="max-w-[2000px] 2xl:max-w-[2400px] 3xl:max-w-[2600px] mx-auto px-4 sm:px-6 lg:px-8 2xl:px-12 h-8 flex items-center justify-center sm:justify-between tracking-wide">
           <span className="font-semibold">Free delivery on all orders</span>
           <span className="hidden sm:inline text-[#FFFDEB]/80 font-medium">Genuine Brands | GST Invoice | Fast Dispatch</span>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3 sm:gap-4">
+      <div className="max-w-[2000px] 2xl:max-w-[2400px] 3xl:max-w-[2600px] mx-auto px-4 sm:px-6 lg:px-8 2xl:px-12 h-16 flex items-center justify-between gap-3 sm:gap-4">
         <Link href="/" className="flex items-center shrink-0">
           <Image
             src="/images/buraq-logo.png"
@@ -93,7 +93,7 @@ export function Navbar() {
         </Link>
 
         {/* Search & Sort in Navbar */}
-        <div className="flex-1 max-w-sm xl:max-w-md hidden md:flex items-center h-10 rounded-2xl bg-white border border-[#E2DED5] shadow-xs transition-none">
+        <div className="flex-1 max-w-sm xl:max-w-md 2xl:max-w-lg 3xl:max-w-xl hidden md:flex items-center h-10 rounded-2xl bg-white border border-[#E2DED5] shadow-xs transition-none">
           {/* Search Input */}
           <div className="relative flex-1 h-full flex items-center">
             <Search className="w-4 h-4 text-[#07543F] absolute left-3.5 pointer-events-none" />

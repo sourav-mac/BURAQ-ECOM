@@ -12,7 +12,7 @@ export default function CategoryPage() {
   const category = useCategories().find((c) => c.id === categoryId);
   return (
     <div className="flex-1 flex flex-col">
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+      <div className="w-full max-w-[2000px] 2xl:max-w-[2400px] 3xl:max-w-[2600px] mx-auto px-4 sm:px-6 lg:px-8 2xl:px-12 pt-4">
         <button
           type="button"
           onClick={() => {

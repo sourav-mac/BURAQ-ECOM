@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Plus, Minus, ShoppingCart, Check } from "lucide-react";
+import { ArrowLeft, Plus, Minus, ShoppingCart, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { api, inr, ProductDetail } from "@/lib/api";
 import { useCart } from "@/context/CartContext";
 import { ProductImage } from "@/components/ProductImage";
@@ -17,13 +17,36 @@ export default function ProductDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   useEffect(() => {
     setProduct(null);
     setError(null);
     setQuantity(1);
+    setSelectedImageIndex(0);
     api.product(id).then(setProduct).catch((e) => setError(e.message));
   }, [id]);
+
+  const allImages = useMemo(() => {
+    const list: string[] = [];
+    if (product?.photos && product.photos.length > 0) {
+      for (const p of product.photos) {
+        if (p?.trim() && !list.includes(p.trim())) list.push(p.trim());
+      }
+    } else if (product?.images && product.images.length > 0) {
+      for (const img of product.images) {
+        if (img?.publicUrl?.trim() && !list.includes(img.publicUrl.trim())) {
+          list.push(img.publicUrl.trim());
+        }
+      }
+    }
+    if (product?.photoUrl?.trim() && !list.includes(product.photoUrl.trim())) {
+      list.unshift(product.photoUrl.trim());
+    }
+    return list;
+  }, [product]);
+
+  const currentImage = allImages[selectedImageIndex] || product?.photoUrl || null;
 
   if (error) {
     return (
@@ -39,8 +62,8 @@ export default function ProductDetailPage() {
 
   if (!product) {
     return (
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 animate-pulse">
-        <div className="w-full max-w-[430px] mx-auto aspect-square rounded-2xl bg-[#E2DED5]/40" />
+      <div className="w-full max-w-[1800px] 2xl:max-w-[2200px] 3xl:max-w-[2400px] mx-auto px-4 sm:px-6 lg:px-8 2xl:px-12 py-6 grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 2xl:gap-16 items-center animate-pulse">
+        <div className="w-full max-w-[430px] 2xl:max-w-[560px] 3xl:max-w-[620px] mx-auto aspect-square rounded-2xl bg-[#E2DED5]/40" />
         <div className="space-y-4 pt-4">
           <div className="h-3 w-24 bg-[#E2DED5]/60 rounded" />
           <div className="h-7 w-3/4 bg-[#E2DED5]/60 rounded" />
@@ -70,7 +93,7 @@ export default function ProductDetailPage() {
   ];
 
   return (
-    <div className="w-full flex-1 flex flex-col justify-center px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-3 md:py-6">
+    <div className="w-full flex-1 flex flex-col justify-center px-4 sm:px-6 lg:px-8 2xl:px-12 max-w-[1800px] 2xl:max-w-[2200px] 3xl:max-w-[2400px] mx-auto py-3 md:py-6">
       <div className="mb-2">
         <button
           type="button"
@@ -88,16 +111,70 @@ export default function ProductDetailPage() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-center">
-        <div className="w-full flex items-center justify-center">
-          <ProductImage
-            src={product.photoUrl}
-            alt={product.name}
-            className="w-full max-w-[430px] aspect-square rounded-2xl border border-[#E2DED5] shadow-xs"
-          />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 2xl:gap-16 items-start">
+        <div className="w-full flex flex-col items-center justify-center">
+          <div className="w-full max-w-[430px] 2xl:max-w-[560px] 3xl:max-w-[620px] relative group">
+            <ProductImage
+              key={currentImage || "main"}
+              src={currentImage}
+              alt={product.name}
+              className="w-full aspect-square rounded-2xl border border-[#E2DED5] shadow-xs object-cover bg-white"
+            />
+            {allImages.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setSelectedImageIndex((prev) => (prev > 0 ? prev - 1 : allImages.length - 1))}
+                  className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 hover:bg-white text-[#10201F] shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                  aria-label="Previous image"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedImageIndex((prev) => (prev < allImages.length - 1 ? prev + 1 : 0))}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 hover:bg-white text-[#10201F] shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                  aria-label="Next image"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+                <div className="absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-full bg-[#10201F]/70 text-white text-[10px] font-bold tracking-wider pointer-events-none">
+                  {selectedImageIndex + 1} / {allImages.length}
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Thumbnail preview strip below main image */}
+          {allImages.length > 1 && (
+            <div className="flex items-center gap-2.5 mt-3 max-w-[430px] 2xl:max-w-[560px] 3xl:max-w-[620px] w-full overflow-x-auto pb-1">
+              {allImages.map((imgUrl, idx) => {
+                const isSelected = idx === selectedImageIndex;
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setSelectedImageIndex(idx)}
+                    onMouseEnter={() => setSelectedImageIndex(idx)}
+                    className={`relative w-16 h-16 sm:w-18 sm:h-18 rounded-xl overflow-hidden border-2 transition-all shrink-0 bg-white cursor-pointer ${
+                      isSelected
+                        ? "border-[#07543F] shadow-xs ring-2 ring-[#07543F]/20"
+                        : "border-[#E2DED5] opacity-65 hover:opacity-100 hover:border-[#07543F]/50"
+                    }`}
+                  >
+                    <img
+                      src={imgUrl}
+                      alt={`${product.name} preview ${idx + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
-        <div className="flex flex-col justify-center space-y-4 max-w-xl">
+        <div className="flex flex-col justify-center space-y-4 max-w-xl 2xl:max-w-2xl 3xl:max-w-3xl">
           <div>
             <div className="text-xs font-bold uppercase tracking-wider text-[#07543F]">{product.brand || "BURAQ"}</div>
             <h1 className="mt-1 text-xl sm:text-2xl font-black text-[#10201F] leading-snug">{product.name}</h1>

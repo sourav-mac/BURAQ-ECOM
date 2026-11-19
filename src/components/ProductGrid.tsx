@@ -31,7 +31,7 @@ export function ProductGrid({ categoryId, title }: { categoryId?: string; title?
   }, [searchTerm, sortOption, categoryId, reload]);
 
   return (
-    <div className="flex flex-col w-full py-4 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div className="flex flex-col w-full py-4 px-4 sm:px-6 lg:px-8 2xl:px-12 max-w-[2000px] 2xl:max-w-[2400px] 3xl:max-w-[2600px] mx-auto">
       {title && <h1 className="text-lg font-bold text-[#10201F] mb-4">{title}</h1>}
 
       {error ? (
@@ -46,7 +46,7 @@ export function ProductGrid({ categoryId, title }: { categoryId?: string; title?
           </button>
         </div>
       ) : products === null ? (
-        <ProductGridSkeleton count={8} />
+        <ProductGridSkeleton count={12} />
       ) : products.length === 0 ? (
         <div className="py-20 text-center space-y-3">
           <p className="text-base font-bold text-[#10201F]">
@@ -68,7 +68,7 @@ export function ProductGrid({ categoryId, title }: { categoryId?: string; title?
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 gap-6">
           {products.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}
