@@ -1,17 +1,33 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { Suspense, use, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, Plus, Minus, ShoppingCart, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { api, inr, ProductDetail } from "@/lib/api";
 import { useCart } from "@/context/CartContext";
 import { ProductImage } from "@/components/ProductImage";
 
-export default function ProductDetailPage() {
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
+
+function ProductDetailSkeleton() {
+  return (
+    <div className="w-full max-w-[1800px] 2xl:max-w-[2200px] 3xl:max-w-[2400px] mx-auto px-4 sm:px-6 lg:px-8 2xl:px-12 py-6 grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 2xl:gap-16 items-center animate-pulse">
+      <div className="w-full max-w-[430px] 2xl:max-w-[560px] 3xl:max-w-[620px] mx-auto aspect-square rounded-2xl bg-[#E2DED5]/40" />
+      <div className="space-y-4 pt-4">
+        <div className="h-3 w-24 bg-[#E2DED5]/60 rounded" />
+        <div className="h-7 w-3/4 bg-[#E2DED5]/60 rounded" />
+        <div className="h-9 w-32 bg-[#E2DED5]/60 rounded" />
+        <div className="h-16 w-full bg-[#E2DED5]/40 rounded" />
+      </div>
+    </div>
+  );
+}
+
+function ProductDetailContent({ id }: { id: string }) {
   const router = useRouter();
-  const params = useParams();
-  const id = String(params?.id || "");
   const { addToCart } = useCart();
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +40,9 @@ export default function ProductDetailPage() {
     setError(null);
     setQuantity(1);
     setSelectedImageIndex(0);
-    api.product(id).then(setProduct).catch((e) => setError(e.message));
+    if (id) {
+      api.product(id).then(setProduct).catch((e) => setError(e.message));
+    }
   }, [id]);
 
   const allImages = useMemo(() => {
@@ -61,17 +79,7 @@ export default function ProductDetailPage() {
   }
 
   if (!product) {
-    return (
-      <div className="w-full max-w-[1800px] 2xl:max-w-[2200px] 3xl:max-w-[2400px] mx-auto px-4 sm:px-6 lg:px-8 2xl:px-12 py-6 grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 2xl:gap-16 items-center animate-pulse">
-        <div className="w-full max-w-[430px] 2xl:max-w-[560px] 3xl:max-w-[620px] mx-auto aspect-square rounded-2xl bg-[#E2DED5]/40" />
-        <div className="space-y-4 pt-4">
-          <div className="h-3 w-24 bg-[#E2DED5]/60 rounded" />
-          <div className="h-7 w-3/4 bg-[#E2DED5]/60 rounded" />
-          <div className="h-9 w-32 bg-[#E2DED5]/60 rounded" />
-          <div className="h-16 w-full bg-[#E2DED5]/40 rounded" />
-        </div>
-      </div>
-    );
+    return <ProductDetailSkeleton />;
   }
 
   const handleAdd = () => {
@@ -253,5 +261,18 @@ export default function ProductDetailPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function PageParamsResolver({ params }: PageProps) {
+  const unwrapped = use(params);
+  return <ProductDetailContent id={unwrapped.id} />;
+}
+
+export default function ProductDetailPage({ params }: PageProps) {
+  return (
+    <Suspense fallback={<ProductDetailSkeleton />}>
+      <PageParamsResolver params={params} />
+    </Suspense>
   );
 }
