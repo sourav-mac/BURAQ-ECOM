@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LogOut, ShoppingBag, Store, Camera, ArrowLeft } from "lucide-react";
+import { LogOut, ShoppingBag, Store, Camera, MapPin } from "lucide-react";
 import { UserAvatar } from "@/components/UserAvatar";
 import { useAuth } from "@/context/AuthContext";
 import { clean, check, validate, fieldErrorCls } from "@/lib/validation";
@@ -72,22 +72,6 @@ export default function ProfilePage() {
 
   return (
     <div className="flex-1 w-full max-w-4xl mx-auto px-4 sm:px-6 py-8 md:py-12">
-      <div className="mb-4">
-        <button
-          type="button"
-          onClick={() => {
-            if (typeof window !== "undefined" && window.history.length > 1) {
-              router.back();
-            } else {
-              router.push("/");
-            }
-          }}
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#667085] hover:text-[#07543F] transition-colors cursor-pointer"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Back</span>
-        </button>
-      </div>
       <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-8 md:gap-14">
         {/* Left: identity + actions */}
         <aside>
@@ -153,6 +137,10 @@ export default function ProfilePage() {
               My cart
               <span className="ml-auto text-xs text-[#667085]">{totalItems}</span>
             </button>
+            <Link href="/addresses" className={linkCls}>
+              <MapPin className="w-4 h-4 text-[#667085]" />
+              My addresses
+            </Link>
             <Link href="/products" className={linkCls}>
               <Store className="w-4 h-4 text-[#667085]" />
               Shop products

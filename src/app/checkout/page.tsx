@@ -6,21 +6,14 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, Check, ShieldCheck, ReceiptText } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
-import { api, inr } from "@/lib/api";
+import { api, inr, formatAddressLine, ShopAddress } from "@/lib/api";
+import { AddressForm, AddressFormValue, AddressErrors, emptyAddress, validateAddress } from "@/components/AddressForm";
 import { ProductImage } from "@/components/ProductImage";
 import { clean, check, validate, fieldErrorCls, GSTIN_RE } from "@/lib/validation";
 
 const inputCls =
   "w-full h-9 px-3 rounded-lg border border-[#E2DED5] bg-transparent text-xs text-[#10201F] placeholder:text-[#9AA19C] focus:outline-none focus:border-[#07543F] focus:ring-1 focus:ring-[#07543F]/20";
 const labelCls = "block text-[11px] font-bold text-[#445048] mb-1";
-
-const STATES = [
-  "West Bengal", "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Delhi", "Goa",
-  "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh",
-  "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim",
-  "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand",
-];
-
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, subtotal, tax, shipping, totalAmount, clearCart } = useCart();
@@ -29,23 +22,13 @@ export default function CheckoutPage() {
     typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : String(Date.now())
   );
 
-  const [form, setForm] = useState({ fullName: "", phone: "", address: "", city: "", state: "West Bengal", pincode: "", gstin: "" });
-  type FormKey = keyof typeof form;
-  const CLEANERS: Partial<Record<FormKey, (v: string) => string>> = {
-    fullName: clean.name,
-    phone: clean.phone,
-    address: clean.address,
-    city: clean.city,
-    pincode: clean.pincode,
-    gstin: clean.gstin,
-  };
-  const set = (k: FormKey) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const v = CLEANERS[k] ? CLEANERS[k]!(e.target.value) : e.target.value;
-    setForm((f) => ({ ...f, [k]: v }));
-    if (fieldErrors[k]) setFieldErrors((fe) => ({ ...fe, [k]: undefined }));
-  };
-  const [fieldErrors, setFieldErrors] = useState<Partial<Record<FormKey, string>>>({});
-  const err = (k: FormKey) => (fieldErrors[k] ? <p className={fieldErrorCls}>{fieldErrors[k]}</p> : null);
+  // Delivery address: a saved one (id) or "new" (typed below, then saved to the address book)
+  const [addresses, setAddresses] = useState<ShopAddress[] | null>(null);
+  const [selectedAddressId, setSelectedAddressId] = useState<string>("new");
+  const [newAddress, setNewAddress] = useState<AddressFormValue>(emptyAddress());
+  const [addressErrors, setAddressErrors] = useState<AddressErrors>({});
+  const [gstin, setGstin] = useState("");
+  const [gstinError, setGstinError] = useState<string | null>(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -56,55 +39,62 @@ export default function CheckoutPage() {
     if (!isLoading && !user && items.length > 0 && !placed) router.replace("/signin?next=/checkout");
   }, [isLoading, user, items.length, placed, router]);
 
-  // Prefill from the customer's saved profile
+  // Load saved addresses; pre-select the default one. Prefill a new address from the profile.
   useEffect(() => {
     if (!user) return;
-    setForm((f) => ({
-      fullName: f.fullName || clean.name(user.name),
-      phone: f.phone || clean.phone(user.phone || ""),
-      address: f.address || user.address || "",
-      city: f.city || user.city || "",
-      state: user.state || f.state,
-      pincode: f.pincode || user.pincode || "",
-      gstin: f.gstin || user.gstin || "",
+    setGstin((g) => g || user.gstin || "");
+    setNewAddress((a) => ({
+      ...a,
+      fullName: a.fullName || clean.name(user.name),
+      phone: a.phone || clean.phone(user.phone || ""),
     }));
+    api
+      .addresses()
+      .then((list) => {
+        setAddresses(list);
+        const def = list.find((x) => x.isDefault) ?? list[0];
+        setSelectedAddressId(def ? def.id : "new");
+      })
+      .catch(() => setAddresses([]));
   }, [user]);
+
+  const selectedAddress = addresses?.find((a) => a.id === selectedAddressId) ?? null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (items.length === 0 || isSubmitting) return;
-    const errs = validate({
-      fullName: check.name(form.fullName),
-      phone: check.phone(form.phone),
-      address: check.address(form.address),
-      city: check.city(form.city),
-      pincode: check.pincode(form.pincode),
-      gstin: check.gstin(form.gstin),
-      state: form.state ? null : "Choose your state.",
-    });
-    setFieldErrors(errs ?? {});
-    if (errs) return setError("Please fix the highlighted fields.");
+    const usingNew = selectedAddressId === "new" || !selectedAddress;
+    const addrErrs = usingNew ? validateAddress(newAddress) : null;
+    const gErr = check.gstin(gstin);
+    setAddressErrors(addrErrs ?? {});
+    setGstinError(gErr);
+    if (addrErrs || gErr) return setError("Please fix the highlighted fields.");
     setIsSubmitting(true);
     setError(null);
     try {
       const order = await api.placeOrder({
         items: items.map(({ product, quantity }) => ({ productId: product.id, quantity })),
-        address: {
-          fullName: form.fullName.trim(),
-          phone: form.phone.trim(),
-          addressLine: form.address.trim(),
-          city: form.city.trim(),
-          state: form.state,
-          pincode: form.pincode,
-        },
-        gstin: form.gstin || undefined,
+        ...(usingNew
+          ? {
+              address: {
+                label: newAddress.label,
+                fullName: newAddress.fullName.trim(),
+                phone: newAddress.phone.trim(),
+                addressLine: newAddress.addressLine.trim(),
+                city: newAddress.city.trim(),
+                state: newAddress.state,
+                pincode: newAddress.pincode,
+              },
+            }
+          : { addressId: selectedAddress!.id }),
+        gstin: gstin || undefined,
         idempotencyKey: idempotencyKey.current,
       });
       setPlaced({
         id: order.id,
         orderNumber: order.orderNumber,
         total: order.grandTotal,
-        address: `${form.address}, ${form.city}, ${form.state} - ${form.pincode}`,
+        address: formatAddressLine(usingNew ? newAddress : selectedAddress!),
       });
       clearCart();
     } catch (err) {
@@ -123,7 +113,7 @@ export default function CheckoutPage() {
         </div>
         <h1 className="mt-4 text-xl font-bold text-[#10201F]">Order placed successfully</h1>
         <p className="mt-1.5 text-xs text-[#667085]">
-          Thanks, {form.fullName.split(" ")[0]}. Your order{" "}
+          Thanks, {(selectedAddress?.fullName || newAddress.fullName || user?.name || "").split(" ")[0]}. Your order{" "}
           <span className="font-bold text-[#10201F]">{placed.orderNumber}</span> has been received.
         </p>
 
@@ -143,7 +133,7 @@ export default function CheckoutPage() {
         </dl>
 
         <p className="mt-4 text-[11px] text-[#667085]">
-          Your {form.gstin ? "GST" : "non-GST"} invoice will be available in My Orders once the order is dispatched.
+          Your {gstin ? "GST" : "non-GST"} invoice will be available in My Orders once the order is dispatched.
         </p>
 
         <div className="mt-5 flex flex-col sm:flex-row gap-2 justify-center">
@@ -198,79 +188,106 @@ export default function CheckoutPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6 lg:gap-10 items-start">
         <form id="checkout-form" onSubmit={handleSubmit} className="space-y-0">
+          {/* 1. Delivery address — saved addresses or a new one */}
           <div className="pb-3">
-            <h2 className="text-xs font-black uppercase tracking-wider text-[#07543F] mb-2">1. Contact Information</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-              <div>
-                <label className={labelCls}>Full Name *</label>
-                <input value={form.fullName} onChange={set("fullName")} placeholder="Rajesh Kumar" autoComplete="name" maxLength={60} className={inputCls} />
-                {err("fullName")}
-              </div>
-              <div>
-                <label className={labelCls}>Mobile Number *</label>
-                <input type="tel" inputMode="numeric" value={form.phone} onChange={set("phone")} placeholder="9830000000" autoComplete="tel-national" maxLength={10} className={inputCls} />
-                {err("phone")}
-              </div>
-              <div>
-                <label className={labelCls}>Email Address</label>
-                <input value={user.email} disabled className={`${inputCls} text-[#667085]`} />
-              </div>
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-xs font-black uppercase tracking-wider text-[#07543F]">1. Delivery Address</h2>
+              {addresses && addresses.length > 0 && (
+                <Link href="/addresses" className="text-[11px] font-semibold text-[#07543F] hover:underline">
+                  Manage addresses
+                </Link>
+              )}
             </div>
+
+            {addresses === null ? (
+              <div className="h-16 rounded-xl bg-[#E2DED5]/30 animate-pulse" />
+            ) : (
+              <div className="space-y-2">
+                {addresses.map((a) => {
+                  const active = selectedAddressId === a.id;
+                  return (
+                    <label
+                      key={a.id}
+                      className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${
+                        active ? "border-[#07543F] bg-[#F2F7F4]/60" : "border-[#E2DED5] hover:border-[#C9C2B3]"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="delivery-address"
+                        checked={active}
+                        onChange={() => setSelectedAddressId(a.id)}
+                        className="mt-0.5 w-4 h-4 accent-[#07543F]"
+                      />
+                      <div className="min-w-0 text-xs">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-[#10201F]">{a.fullName}</span>
+                          <span className="text-xs font-medium text-[#667085]">({a.label})</span>
+                          {a.isDefault && <span className="text-[10px] font-semibold text-[#07543F]">Default</span>}
+                        </div>
+                        <p className="text-[#445048] mt-0.5">{formatAddressLine(a)}</p>
+                        <p className="text-[#667085] mt-0.5">Mobile: {a.phone}</p>
+                      </div>
+                    </label>
+                  );
+                })}
+
+                {/* New address */}
+                <label
+                  className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${
+                    selectedAddressId === "new" ? "border-[#07543F]" : "border-dashed border-[#C9C2B3] hover:border-[#07543F]"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="delivery-address"
+                    checked={selectedAddressId === "new"}
+                    onChange={() => setSelectedAddressId("new")}
+                    className="w-4 h-4 accent-[#07543F]"
+                  />
+                  <span className="text-xs font-bold text-[#07543F]">
+                    {addresses.length ? "+ Add a new address" : "Enter delivery address"}
+                  </span>
+                </label>
+
+                {selectedAddressId === "new" && (
+                  <div className="pt-1">
+                    <AddressForm
+                      value={newAddress}
+                      onChange={(v) => {
+                        setNewAddress(v);
+                        if (Object.keys(addressErrors).length) setAddressErrors({});
+                      }}
+                      errors={addressErrors}
+                      inputCls={inputCls}
+                      labelCls={labelCls}
+                    />
+                    <p className="mt-2 text-[11px] text-[#667085]">This address will be saved for your next order.</p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
-          <div className="pb-3 -mt-1">
-            <label className={labelCls}>
-              Business GSTIN <span className="font-normal text-[#9AA19C]">(optional — for GST input credit)</span>
-            </label>
+          {/* 2. Business GSTIN (optional) */}
+          <div className="py-3 border-t border-[#EFECE3]">
+            <h2 className="text-xs font-black uppercase tracking-wider text-[#07543F] mb-2">2. Business GSTIN (optional)</h2>
             <input
-              value={form.gstin}
-              onChange={set("gstin")}
+              value={gstin}
+              onChange={(e) => {
+                setGstin(clean.gstin(e.target.value));
+                setGstinError(null);
+              }}
               placeholder="19ABCDE1234F1Z5"
               maxLength={15}
               className={`${inputCls} sm:max-w-[calc(66.666%-0.3rem)] font-mono tracking-wide`}
             />
-            {fieldErrors.gstin
-              ? err("gstin")
-              : form.gstin && form.gstin.length === 15 && !GSTIN_RE.test(form.gstin) && (
-                  <p className={fieldErrorCls}>This doesn&apos;t look like a valid GSTIN.</p>
-                )}
-          </div>
-
-          <div className="py-3 border-t border-[#EFECE3]">
-            <h2 className="text-xs font-black uppercase tracking-wider text-[#07543F] mb-2">2. Delivery Address</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-2.5">
-              <div className="sm:col-span-4">
-                <label className={labelCls}>Street Address / House No. *</label>
-                <input value={form.address} onChange={set("address")} placeholder="House no, street, landmark" autoComplete="street-address" maxLength={200} className={inputCls} />
-                {err("address")}
-              </div>
-              <div className="sm:col-span-2">
-                <label className={labelCls}>City / Town *</label>
-                <input value={form.city} onChange={set("city")} placeholder="Kolkata" autoComplete="address-level2" maxLength={50} className={inputCls} />
-                {err("city")}
-              </div>
-              <div>
-                <label className={labelCls}>State *</label>
-                <select required value={form.state} onChange={set("state")} className={`${inputCls} cursor-pointer`}>
-                  {STATES.map((s) => (
-                    <option key={s}>{s}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className={labelCls}>PIN Code *</label>
-                <input
-                  inputMode="numeric"
-                  maxLength={6}
-                  value={form.pincode}
-                  onChange={set("pincode")}
-                  placeholder="700001"
-                  autoComplete="postal-code"
-                  className={inputCls}
-                />
-                {err("pincode")}
-              </div>
-            </div>
+            {gstinError ? (
+              <p className={fieldErrorCls}>{gstinError}</p>
+            ) : (
+              gstin && gstin.length === 15 && !GSTIN_RE.test(gstin) && <p className={fieldErrorCls}>This doesn&apos;t look like a valid GSTIN.</p>
+            )}
+            <p className="mt-1 text-[11px] text-[#9AA19C]">For a GST tax invoice (input tax credit). Order updates go to {user.email}.</p>
           </div>
 
           <div className="py-3 border-t border-[#EFECE3]">
@@ -311,7 +328,7 @@ export default function CheckoutPage() {
               <dt>Subtotal</dt>
               <dd className="text-[#10201F] font-semibold">{inr(subtotal)}</dd>
             </div>
-            {form.gstin ? (
+            {gstin ? (
               <div className="flex justify-between text-[#667085]">
                 <dt>GST (included)</dt>
                 <dd className="text-[#10201F] font-semibold">{inr(tax)}</dd>
@@ -353,7 +370,7 @@ export default function CheckoutPage() {
 
           <div className="flex items-center justify-center gap-1.5 text-[10px] text-[#667085] pt-1">
             <ShieldCheck className="w-3.5 h-3.5 text-[#07543F]" />
-            <span>{form.gstin ? "GST tax invoice for your business" : "Add your GSTIN above for a GST invoice"}</span>
+            <span>{gstin ? "GST tax invoice for your business" : "Add your GSTIN above for a GST invoice"}</span>
           </div>
         </aside>
       </div>

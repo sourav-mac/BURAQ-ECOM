@@ -244,13 +244,44 @@ export const api = {
 
   placeOrder: (body: {
     items: { productId: string; quantity: number }[];
-    address: { fullName: string; phone: string; addressLine: string; city: string; state: string; pincode: string };
+    /** Pick a saved address … */
+    addressId?: string;
+    /** … or send a new one (saved to the address book automatically) */
+    address?: AddressInput;
     gstin?: string;
     idempotencyKey?: string;
   }) => request<{ id: string; orderNumber: string; grandTotal: number }>("/orders", { method: "POST", body: JSON.stringify(body) }).then((r) => r.data),
 
+  // ─── Saved delivery addresses ───────────────────────────────────────────────
+  addresses: () => request<ShopAddress[]>("/addresses").then((r) => r.data),
+  addAddress: (body: AddressInput & { isDefault?: boolean }) =>
+    request<ShopAddress>("/addresses", { method: "POST", body: JSON.stringify(body) }).then((r) => r.data),
+  updateAddress: (id: string, body: Partial<AddressInput> & { isDefault?: boolean }) =>
+    request<ShopAddress>(`/addresses/${id}`, { method: "PATCH", body: JSON.stringify(body) }).then((r) => r.data),
+  deleteAddress: (id: string) => request<{ id: string }>(`/addresses/${id}`, { method: "DELETE" }).then((r) => r.data),
+
   invoiceUrl: (orderId: string) => `${API_URL}/shop/orders/${orderId}/invoice?token=${encodeURIComponent(tokenStore.get() || "")}`,
 };
+
+export interface AddressInput {
+  label?: string;
+  fullName: string;
+  phone: string;
+  addressLine: string;
+  city: string;
+  state: string;
+  pincode: string;
+}
+
+export interface ShopAddress extends AddressInput {
+  id: string;
+  label: string;
+  isDefault: boolean;
+}
+
+/** "House 12, Park Street, Kolkata, West Bengal - 700016" */
+export const formatAddressLine = (a: Pick<AddressInput, "addressLine" | "city" | "state" | "pincode">) =>
+  `${a.addressLine}, ${a.city}, ${a.state} - ${a.pincode}`;
 
 export const inr = (n: number) =>
   `₹${n.toLocaleString("en-IN", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;

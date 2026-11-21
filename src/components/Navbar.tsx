@@ -18,6 +18,7 @@ import {
   Fan,
   Zap,
   Package,
+  MapPin,
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
@@ -261,6 +262,15 @@ export function Navbar() {
                     >
                       <Package className="w-3.5 h-3.5 text-[#07543F]" />
                       <span>My Orders</span>
+                    </Link>
+
+                    <Link
+                      href="/addresses"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2 px-3.5 py-1.5 text-xs font-bold text-[#10201F] hover:bg-[#FAF8E4] hover:text-[#07543F] transition-colors"
+                    >
+                      <MapPin className="w-3.5 h-3.5 text-[#07543F]" />
+                      <span>My Addresses</span>
                     </Link>
                   </div>
 
