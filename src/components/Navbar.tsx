@@ -75,7 +75,7 @@ export function Navbar() {
       {/* Announcement bar */}
       <div className="bg-[#07543F] text-[#FFFDEB] text-[11px] sm:text-xs">
         <div className="max-w-[2000px] 2xl:max-w-[2400px] 3xl:max-w-[2600px] mx-auto px-4 sm:px-6 lg:px-8 2xl:px-12 h-8 flex items-center justify-center sm:justify-between tracking-wide">
-          <span className="font-semibold">Free delivery on all orders</span>
+          <span className="font-semibold">Free delivery above ₹499</span>
           <span className="hidden sm:inline text-[#FFFDEB]/80 font-medium">Genuine Brands | GST Invoice | Fast Dispatch</span>
         </div>
       </div>

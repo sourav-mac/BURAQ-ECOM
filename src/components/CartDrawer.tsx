@@ -123,10 +123,15 @@ export function CartDrawer() {
                 </div>
                 <div className="flex justify-between text-[#667085]">
                   <dt>Delivery</dt>
-                  <dd className={shipping === 0 ? "text-[#07543F] font-medium" : "text-[#10201F]"}>
+                  <dd className={shipping === 0 ? "text-[#07543F] font-semibold" : "text-[#10201F] font-semibold"}>
                     {shipping === 0 ? "Free" : inr(shipping)}
                   </dd>
                 </div>
+                {shipping > 0 && (
+                  <p className="text-[11px] text-[#07543F] font-medium bg-[#07543F]/5 p-2 rounded-lg">
+                    Add {inr(500 - subtotal)} more for <strong>FREE Delivery</strong>!
+                  </p>
+                )}
                 <div className="flex justify-between pt-3 border-t border-[#EFECE3] text-base font-semibold text-[#10201F]">
                   <dt>Total</dt>
                   <dd>{inr(totalAmount)}</dd>

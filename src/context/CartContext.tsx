@@ -153,8 +153,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         return sum + (gross - gross / (1 + product.gstPercent / 100));
       }, 0) * 100
     ) / 100;
-  const shipping = 0; // free delivery — matches the order total charged by the backend
-  const totalAmount = subtotal;
+  // Delivery rule: ₹99 delivery charge if cart subtotal is under ₹500; Free (₹0) from ₹500 onwards
+  const shipping = items.length > 0 && subtotal < 500 ? 99 : 0;
+  const totalAmount = subtotal + shipping;
 
   return (
     <CartContext.Provider

@@ -165,6 +165,11 @@ export default function OrdersPage() {
                         </span>
                       )}
                       <span>Payment: <span className="text-[#10201F]">Cash on delivery</span></span>
+                      {(o as any).deliveryCharge > 0 ? (
+                        <span>Delivery: <span className="text-[#10201F]">{inr((o as any).deliveryCharge)}</span></span>
+                      ) : (
+                        <span>Delivery: <span className="text-[#07543F] font-medium">Free</span></span>
+                      )}
                       {o.totalGst > 0 ? (
                         <span>GST included: <span className="text-[#10201F]">{inr(o.totalGst)}</span></span>
                       ) : (

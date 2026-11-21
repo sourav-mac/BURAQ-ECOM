@@ -23,7 +23,7 @@ const STATES = [
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, subtotal, tax, totalAmount, clearCart } = useCart();
+  const { items, subtotal, tax, shipping, totalAmount, clearCart } = useCart();
   const { user, isLoading } = useAuth();
   const idempotencyKey = useRef(
     typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : String(Date.now())
@@ -324,8 +324,15 @@ export default function CheckoutPage() {
             )}
             <div className="flex justify-between text-[#667085]">
               <dt>Delivery Charges</dt>
-              <dd className="text-[#07543F] font-bold">FREE</dd>
+              <dd className={shipping === 0 ? "text-[#07543F] font-bold" : "text-[#10201F] font-bold"}>
+                {shipping === 0 ? "FREE" : inr(shipping)}
+              </dd>
             </div>
+            {shipping > 0 && (
+              <p className="text-[11px] text-[#07543F] font-medium bg-[#07543F]/5 p-2 rounded-lg">
+                Add {inr(500 - subtotal)} more for <strong>FREE Delivery</strong>!
+              </p>
+            )}
             <div className="flex justify-between pt-2.5 border-t border-[#E2DED5] text-sm font-black text-[#10201F]">
               <dt>Total Amount</dt>
               <dd className="text-[#07543F] text-base">{inr(totalAmount)}</dd>
